@@ -99,6 +99,37 @@ The Game Studio project has been optimized with several advanced features:
    ```
    说明：脚本会自动在 `services.gradle.org` 与 `downloads.gradle.org` 间切换重试，降低下载失败概率。
 
+## 流程要求：集成测试与发布统一走 GitHub Actions（禁用本地编译）
+
+在集成测试和真机调试场景中，要求**不在本地编译 APK**，只使用 GitHub Actions 产物进行安装验证，流程如下：
+
+1. 在 CI 中触发对应工作流（或推送到分支触发）：
+   ```bash
+   gh workflow run "Android Debug APK" --ref main
+   gh workflow run "Android Release APK" --ref main
+   ```
+2. 等待 `main` 分支流水线成功后，取最新成功 `run-id`：
+   ```bash
+   gh run list --workflow "android-debug.yml" --limit 5 --json databaseId,status,conclusion
+   gh run list --workflow "android-release.yml" --limit 5 --json databaseId,status,conclusion
+   ```
+3. 使用下载脚本安装到真机（默认不会触发本地编译）：
+   ```bash
+   ./scripts/fetch_ci_debug_apk.sh --type=debug --abi=arm64-v8a --serial=<device_serial>
+   ./scripts/fetch_ci_debug_apk.sh --type=release --abi=arm64-v8a --serial=<device_serial>
+   ```
+   - 发布验证建议：`--type=release`
+   - 仅 64 位产物参与打包：`arm64-v8a`、`x86_64`
+4. 安装完成后直接启动验证：
+   - `com.cocos.gamestudio/.GameListActivity`
+   - 日志观察可用 `adb logcat`
+
+### 发布流程（Release）
+
+1. 合并/提交到 `main` 后触发 `Android Release APK`
+2. 确认 `game-studio-release-<abi>-apk` 上传成功
+3. 按类型和 ABI 下载安装验证，再进行版本记录与标签发布
+
 ## 最终验证清单 (Final Checklist)
 1. **启动性能**：内置游戏（Asset）应通过 Zero-Copy VFS 瞬间加载，无解压过程。
 2. **详情交互**：点击游戏展示 BottomSheet，显示准确的元数据。
