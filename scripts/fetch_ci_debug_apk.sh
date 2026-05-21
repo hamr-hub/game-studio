@@ -126,22 +126,14 @@ if [[ -z "${RUN_ID}" || "${RUN_ID}" == "null" ]]; then
   exit 1
 fi
 
-AVAILABLE_ARTIFACTS="$(gh run view "${RUN_ID}" --repo "${REPO}" --json artifacts --jq '.artifacts[].name' | cat)"
-if [[ -z "${AVAILABLE_ARTIFACTS}" ]]; then
-  echo "该次运行未产出任何 artifact: ${RUN_ID}"
-  exit 1
-fi
-
-if ! printf '%s\n' "${AVAILABLE_ARTIFACTS}" | grep -Fxq "${ARTIFACT_NAME}"; then
-  echo "未找到目标产物: ${ARTIFACT_NAME}"
-  echo "该 run 可用产物:"
-  printf '%s\n' "${AVAILABLE_ARTIFACTS}"
-  exit 1
-fi
-
 mkdir -p "${OUT_DIR}"
 rm -rf "${OUT_DIR:?}/"*
-gh run download "${RUN_ID}" --repo "${REPO}" --name "${ARTIFACT_NAME}" --dir "${OUT_DIR}"
+if ! gh run download "${RUN_ID}" --repo "${REPO}" --name "${ARTIFACT_NAME}" --dir "${OUT_DIR}"; then
+  echo "未找到目标产物: ${ARTIFACT_NAME}"
+  echo "该 run 可用产物:"
+  gh api "/repos/${REPO}/actions/runs/${RUN_ID}/artifacts" --jq '.artifacts[].name'
+  exit 1
+fi
 
 APK_PATH="$(find "${OUT_DIR}" -type f -name "*.apk" | head -n 1 || true)"
 if [[ -z "${APK_PATH}" ]]; then

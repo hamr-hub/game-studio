@@ -48,6 +48,12 @@ android {
         }
     }
 
+    sourceSets {
+        main {
+            jniLibs.srcDirs += ["${buildDir}/rust-libs"]
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.toVersion(21)
         targetCompatibility JavaVersion.toVersion(21)

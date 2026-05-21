@@ -1,0 +1,262 @@
+The target system is: Android - 1 - x86_64
+The host system is: Linux - 5.15.148-tegra - aarch64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin/clang 
+Build flags: -g;-DANDROID;-fdata-sections;-ffunction-sections;-funwind-tables;-fstack-protector-strong;-no-canonical-prefixes;-D_FORTIFY_SOURCE=2;-Wformat;-Werror=format-security;
+Id flags: -c;--target=x86_64-none-linux-android21 
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CMakeCCompilerId.o"
+
+The C compiler identification is Clang, found in "/mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/x86_64/CMakeFiles/3.22.1/CompilerIdC/CMakeCCompilerId.o"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin/clang++ 
+Build flags: -g;-DANDROID;-fdata-sections;-ffunction-sections;-funwind-tables;-fstack-protector-strong;-no-canonical-prefixes;-D_FORTIFY_SOURCE=2;-Wformat;-Werror=format-security;;
+Id flags: -c;--target=x86_64-none-linux-android21 
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CMakeCXXCompilerId.o"
+
+The CXX compiler identification is Clang, found in "/mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/x86_64/CMakeFiles/3.22.1/CompilerIdCXX/CMakeCXXCompilerId.o"
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/x86_64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/mnt/ssd/codespace/android-sdk/cmake/3.22.1/bin/ninja cmTC_6becb && [1/2] Building C object CMakeFiles/cmTC_6becb.dir/CMakeCCompilerABI.c.o
+Android clang version 21.0.0 (https://github.com/HomuHomu833/llvm-custom 62d18923e0836fef09de95de5a774f56b2434d1a)
+Target: x86_64-none-linux-android21
+Thread model: posix
+InstalledDir: /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin
+ (in-process)
+ "/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin/clang" -cc1 -triple x86_64-none-linux-android21 -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=non-leaf -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -target-feature +sse4.2 -target-feature +popcnt -target-feature +cx16 -tune-cpu generic -debug-info-kind=constructor -dwarf-version=4 -debugger-tuning=gdb -fdebug-compilation-dir=/mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/x86_64/CMakeFiles/CMakeTmp -v -ffunction-sections -fdata-sections -fcoverage-compilation-dir=/mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/x86_64/CMakeFiles/CMakeTmp -resource-dir /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21 -dependency-file CMakeFiles/cmTC_6becb.dir/CMakeCCompilerABI.c.o.d -MT CMakeFiles/cmTC_6becb.dir/CMakeCCompilerABI.c.o -sys-header-deps -D ANDROID -D _FORTIFY_SOURCE=2 -isysroot /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot -internal-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/include -internal-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/local/include -internal-externc-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/x86_64-linux-android -internal-externc-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/include -internal-externc-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include -Wformat -ferror-limit 19 -femulated-tls -stack-protector 2 -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_6becb.dir/CMakeCCompilerABI.c.o -x c /usr/share/cmake-3.22/Modules/CMakeCCompilerABI.c
+clang -cc1 version 21.0.0 based upon LLVM 21.0.0 default target aarch64-linux-android25
+ignoring nonexistent directory "/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/local/include"
+ignoring nonexistent directory "/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/include
+ /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/x86_64-linux-android
+ /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include
+End of search list.
+[2/2] Linking C executable cmTC_6becb
+Android clang version 21.0.0 (https://github.com/HomuHomu833/llvm-custom 62d18923e0836fef09de95de5a774f56b2434d1a)
+Target: x86_64-none-linux-android21
+Thread model: posix
+InstalledDir: /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin
+ "/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin/ld.lld" --sysroot=/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot -z now -z relro -z max-page-size=16384 --no-rosegment --hash-style=both --eh-frame-hdr -m elf_x86_64 -pie -dynamic-linker /system/bin/linker64 -o cmTC_6becb /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtbegin_dynamic.o -L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/x86_64 -L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21 -L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android -L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib --build-id=sha1 --no-rosegment --no-undefined-version --fatal-warnings --no-undefined CMakeFiles/cmTC_6becb.dir/CMakeCCompilerABI.c.o /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a -l:libunwind.a -ldl -lc /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a -l:libunwind.a -ldl /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtend_android.o
+
+
+
+Parsed C implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/include]
+    add: [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/x86_64-linux-android]
+    add: [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include]
+  end of search list found
+  collapse include dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/include] ==> [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/include]
+  collapse include dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/x86_64-linux-android] ==> [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/x86_64-linux-android]
+  collapse include dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include] ==> [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include]
+  implicit include dirs: [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/include;/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/x86_64-linux-android;/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include]
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld\.lld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/x86_64/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command(s):/mnt/ssd/codespace/android-sdk/cmake/3.22.1/bin/ninja cmTC_6becb && [1/2] Building C object CMakeFiles/cmTC_6becb.dir/CMakeCCompilerABI.c.o]
+  ignore line: [Android clang version 21.0.0 (https://github.com/HomuHomu833/llvm-custom 62d18923e0836fef09de95de5a774f56b2434d1a)]
+  ignore line: [Target: x86_64-none-linux-android21]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin]
+  ignore line: [ (in-process)]
+  ignore line: [ "/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin/clang" -cc1 -triple x86_64-none-linux-android21 -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=non-leaf -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -target-feature +sse4.2 -target-feature +popcnt -target-feature +cx16 -tune-cpu generic -debug-info-kind=constructor -dwarf-version=4 -debugger-tuning=gdb -fdebug-compilation-dir=/mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/x86_64/CMakeFiles/CMakeTmp -v -ffunction-sections -fdata-sections -fcoverage-compilation-dir=/mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/x86_64/CMakeFiles/CMakeTmp -resource-dir /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21 -dependency-file CMakeFiles/cmTC_6becb.dir/CMakeCCompilerABI.c.o.d -MT CMakeFiles/cmTC_6becb.dir/CMakeCCompilerABI.c.o -sys-header-deps -D ANDROID -D _FORTIFY_SOURCE=2 -isysroot /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot -internal-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/include -internal-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/local/include -internal-externc-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/x86_64-linux-android -internal-externc-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/include -internal-externc-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include -Wformat -ferror-limit 19 -femulated-tls -stack-protector 2 -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_6becb.dir/CMakeCCompilerABI.c.o -x c /usr/share/cmake-3.22/Modules/CMakeCCompilerABI.c]
+  ignore line: [clang -cc1 version 21.0.0 based upon LLVM 21.0.0 default target aarch64-linux-android25]
+  ignore line: [ignoring nonexistent directory "/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/local/include"]
+  ignore line: [ignoring nonexistent directory "/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/include"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/include]
+  ignore line: [ /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/x86_64-linux-android]
+  ignore line: [ /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include]
+  ignore line: [End of search list.]
+  ignore line: [[2/2] Linking C executable cmTC_6becb]
+  ignore line: [Android clang version 21.0.0 (https://github.com/HomuHomu833/llvm-custom 62d18923e0836fef09de95de5a774f56b2434d1a)]
+  ignore line: [Target: x86_64-none-linux-android21]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin]
+  link line: [ "/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin/ld.lld" --sysroot=/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot -z now -z relro -z max-page-size=16384 --no-rosegment --hash-style=both --eh-frame-hdr -m elf_x86_64 -pie -dynamic-linker /system/bin/linker64 -o cmTC_6becb /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtbegin_dynamic.o -L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/x86_64 -L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21 -L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android -L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib --build-id=sha1 --no-rosegment --no-undefined-version --fatal-warnings --no-undefined CMakeFiles/cmTC_6becb.dir/CMakeCCompilerABI.c.o /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a -l:libunwind.a -ldl -lc /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a -l:libunwind.a -ldl /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtend_android.o]
+    arg [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin/ld.lld] ==> ignore
+    arg [--sysroot=/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot] ==> ignore
+    arg [-znow] ==> ignore
+    arg [-zrelro] ==> ignore
+    arg [-zmax-page-size=16384] ==> ignore
+    arg [--no-rosegment] ==> ignore
+    arg [--hash-style=both] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/system/bin/linker64] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_6becb] ==> ignore
+    arg [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtbegin_dynamic.o] ==> obj [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtbegin_dynamic.o]
+    arg [-L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/x86_64] ==> dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/x86_64]
+    arg [-L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21] ==> dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21]
+    arg [-L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android] ==> dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android]
+    arg [-L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib] ==> dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib]
+    arg [--build-id=sha1] ==> ignore
+    arg [--no-rosegment] ==> ignore
+    arg [--no-undefined-version] ==> ignore
+    arg [--fatal-warnings] ==> ignore
+    arg [--no-undefined] ==> ignore
+    arg [CMakeFiles/cmTC_6becb.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a] ==> lib [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a]
+    arg [-l:libunwind.a] ==> lib [-l:libunwind.a]
+    arg [-ldl] ==> lib [dl]
+    arg [-lc] ==> lib [c]
+    arg [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a] ==> lib [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a]
+    arg [-l:libunwind.a] ==> lib [-l:libunwind.a]
+    arg [-ldl] ==> lib [dl]
+    arg [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtend_android.o] ==> obj [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtend_android.o]
+  remove lib [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a]
+  remove lib [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a]
+  collapse library dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/x86_64] ==> [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/x86_64]
+  collapse library dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21] ==> [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21]
+  collapse library dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android] ==> [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android]
+  collapse library dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib] ==> [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib]
+  implicit libs: [-l:libunwind.a;dl;c;-l:libunwind.a;dl]
+  implicit objs: [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtbegin_dynamic.o;/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtend_android.o]
+  implicit dirs: [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/x86_64;/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21;/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android;/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib]
+  implicit fwks: []
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/x86_64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/mnt/ssd/codespace/android-sdk/cmake/3.22.1/bin/ninja cmTC_a3a17 && [1/2] Building CXX object CMakeFiles/cmTC_a3a17.dir/CMakeCXXCompilerABI.cpp.o
+Android clang version 21.0.0 (https://github.com/HomuHomu833/llvm-custom 62d18923e0836fef09de95de5a774f56b2434d1a)
+Target: x86_64-none-linux-android21
+Thread model: posix
+InstalledDir: /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin
+ (in-process)
+ "/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin/clang++" -cc1 -triple x86_64-none-linux-android21 -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=non-leaf -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -target-feature +sse4.2 -target-feature +popcnt -target-feature +cx16 -tune-cpu generic -debug-info-kind=constructor -dwarf-version=4 -debugger-tuning=gdb -fdebug-compilation-dir=/mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/x86_64/CMakeFiles/CMakeTmp -v -ffunction-sections -fdata-sections -fcoverage-compilation-dir=/mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/x86_64/CMakeFiles/CMakeTmp -resource-dir /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21 -dependency-file CMakeFiles/cmTC_a3a17.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_a3a17.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -D ANDROID -D _FORTIFY_SOURCE=2 -isysroot /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot -internal-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/c++/v1 -internal-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/include -internal-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/local/include -internal-externc-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/x86_64-linux-android -internal-externc-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/include -internal-externc-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include -Wformat -fdeprecated-macro -ferror-limit 19 -femulated-tls -stack-protector 2 -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -fcxx-exceptions -fexceptions -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_a3a17.dir/CMakeCXXCompilerABI.cpp.o -x c++ /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp
+clang -cc1 version 21.0.0 based upon LLVM 21.0.0 default target aarch64-linux-android25
+ignoring nonexistent directory "/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/local/include"
+ignoring nonexistent directory "/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/c++/v1
+ /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/include
+ /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/x86_64-linux-android
+ /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include
+End of search list.
+[2/2] Linking CXX executable cmTC_a3a17
+Android clang version 21.0.0 (https://github.com/HomuHomu833/llvm-custom 62d18923e0836fef09de95de5a774f56b2434d1a)
+Target: x86_64-none-linux-android21
+Thread model: posix
+InstalledDir: /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin
+ "/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin/ld.lld" --sysroot=/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot -z now -z relro -z max-page-size=16384 --no-rosegment --hash-style=both --eh-frame-hdr -m elf_x86_64 -pie -dynamic-linker /system/bin/linker64 -o cmTC_a3a17 /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtbegin_dynamic.o -L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/x86_64 -L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21 -L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android -L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib --build-id=sha1 --no-rosegment --no-undefined-version --fatal-warnings --no-undefined CMakeFiles/cmTC_a3a17.dir/CMakeCXXCompilerABI.cpp.o -Bstatic -lc++ -Bdynamic -lm /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a -l:libunwind.a -ldl -lc /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a -l:libunwind.a -ldl /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtend_android.o
+
+
+
+Parsed CXX implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/c++/v1]
+    add: [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/include]
+    add: [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/x86_64-linux-android]
+    add: [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include]
+  end of search list found
+  collapse include dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/c++/v1] ==> [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/c++/v1]
+  collapse include dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/include] ==> [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/include]
+  collapse include dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/x86_64-linux-android] ==> [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/x86_64-linux-android]
+  collapse include dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include] ==> [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include]
+  implicit include dirs: [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/c++/v1;/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/include;/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/x86_64-linux-android;/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include]
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld\.lld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/x86_64/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command(s):/mnt/ssd/codespace/android-sdk/cmake/3.22.1/bin/ninja cmTC_a3a17 && [1/2] Building CXX object CMakeFiles/cmTC_a3a17.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [Android clang version 21.0.0 (https://github.com/HomuHomu833/llvm-custom 62d18923e0836fef09de95de5a774f56b2434d1a)]
+  ignore line: [Target: x86_64-none-linux-android21]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin]
+  ignore line: [ (in-process)]
+  ignore line: [ "/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin/clang++" -cc1 -triple x86_64-none-linux-android21 -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=non-leaf -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -target-feature +sse4.2 -target-feature +popcnt -target-feature +cx16 -tune-cpu generic -debug-info-kind=constructor -dwarf-version=4 -debugger-tuning=gdb -fdebug-compilation-dir=/mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/x86_64/CMakeFiles/CMakeTmp -v -ffunction-sections -fdata-sections -fcoverage-compilation-dir=/mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/x86_64/CMakeFiles/CMakeTmp -resource-dir /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21 -dependency-file CMakeFiles/cmTC_a3a17.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_a3a17.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -D ANDROID -D _FORTIFY_SOURCE=2 -isysroot /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot -internal-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/c++/v1 -internal-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/include -internal-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/local/include -internal-externc-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/x86_64-linux-android -internal-externc-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/include -internal-externc-isystem /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include -Wformat -fdeprecated-macro -ferror-limit 19 -femulated-tls -stack-protector 2 -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -fcxx-exceptions -fexceptions -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_a3a17.dir/CMakeCXXCompilerABI.cpp.o -x c++ /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [clang -cc1 version 21.0.0 based upon LLVM 21.0.0 default target aarch64-linux-android25]
+  ignore line: [ignoring nonexistent directory "/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/local/include"]
+  ignore line: [ignoring nonexistent directory "/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/include"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/c++/v1]
+  ignore line: [ /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/include]
+  ignore line: [ /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include/x86_64-linux-android]
+  ignore line: [ /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/include]
+  ignore line: [End of search list.]
+  ignore line: [[2/2] Linking CXX executable cmTC_a3a17]
+  ignore line: [Android clang version 21.0.0 (https://github.com/HomuHomu833/llvm-custom 62d18923e0836fef09de95de5a774f56b2434d1a)]
+  ignore line: [Target: x86_64-none-linux-android21]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin]
+  link line: [ "/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin/ld.lld" --sysroot=/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot -z now -z relro -z max-page-size=16384 --no-rosegment --hash-style=both --eh-frame-hdr -m elf_x86_64 -pie -dynamic-linker /system/bin/linker64 -o cmTC_a3a17 /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtbegin_dynamic.o -L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/x86_64 -L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21 -L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android -L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib --build-id=sha1 --no-rosegment --no-undefined-version --fatal-warnings --no-undefined CMakeFiles/cmTC_a3a17.dir/CMakeCXXCompilerABI.cpp.o -Bstatic -lc++ -Bdynamic -lm /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a -l:libunwind.a -ldl -lc /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a -l:libunwind.a -ldl /home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtend_android.o]
+    arg [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/bin/ld.lld] ==> ignore
+    arg [--sysroot=/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot] ==> ignore
+    arg [-znow] ==> ignore
+    arg [-zrelro] ==> ignore
+    arg [-zmax-page-size=16384] ==> ignore
+    arg [--no-rosegment] ==> ignore
+    arg [--hash-style=both] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/system/bin/linker64] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_a3a17] ==> ignore
+    arg [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtbegin_dynamic.o] ==> obj [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtbegin_dynamic.o]
+    arg [-L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/x86_64] ==> dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/x86_64]
+    arg [-L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21] ==> dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21]
+    arg [-L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android] ==> dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android]
+    arg [-L/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib] ==> dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib]
+    arg [--build-id=sha1] ==> ignore
+    arg [--no-rosegment] ==> ignore
+    arg [--no-undefined-version] ==> ignore
+    arg [--fatal-warnings] ==> ignore
+    arg [--no-undefined] ==> ignore
+    arg [CMakeFiles/cmTC_a3a17.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-Bstatic] ==> search static
+    arg [-lc++] ==> lib [c++]
+    arg [-Bdynamic] ==> search dynamic
+    arg [-lm] ==> lib [m]
+    arg [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a] ==> lib [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a]
+    arg [-l:libunwind.a] ==> lib [-l:libunwind.a]
+    arg [-ldl] ==> lib [dl]
+    arg [-lc] ==> lib [c]
+    arg [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a] ==> lib [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a]
+    arg [-l:libunwind.a] ==> lib [-l:libunwind.a]
+    arg [-ldl] ==> lib [dl]
+    arg [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtend_android.o] ==> obj [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtend_android.o]
+  remove lib [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a]
+  remove lib [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64-android.a]
+  collapse library dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/x86_64] ==> [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/x86_64]
+  collapse library dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21] ==> [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21]
+  collapse library dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android] ==> [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android]
+  collapse library dir [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib] ==> [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib]
+  implicit libs: [c++;m;-l:libunwind.a;dl;c;-l:libunwind.a;dl]
+  implicit objs: [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtbegin_dynamic.o;/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21/crtend_android.o]
+  implicit dirs: [/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/lib/clang/21/lib/linux/x86_64;/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android/21;/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib/x86_64-linux-android;/home/hyx/codespace/android-sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-arm64/sysroot/usr/lib]
+  implicit fwks: []
+
+

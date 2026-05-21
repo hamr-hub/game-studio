@@ -1,0 +1,2 @@
+/mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/x86_64/CMakeFiles/edit_cache.dir
+/mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/x86_64/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/mnt/ssd/codespace/cocos-engine/game-studio/app/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/mnt/ssd/codespace/android-sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/armeabi-v7a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/mnt/ssd/codespace/android-sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/mnt/ssd/codespace/cocos-engine/game-studio/app/.cxx/Debug/656x272t/armeabi-v7a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

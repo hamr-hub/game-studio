@@ -1,5 +1,5 @@
 [package]
-name = "cocos-studio-native"
+name = "cocos_studio"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,7 +8,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 jni = "0.21"
-cocos4-rust = { path = "../../../cocos4-rust" }
+cocos4-rust = { path = "../../cocos4-rust" }
 ndk = { version = "0.7", features = ["asset"] }
 ndk-glue = "0.7"
 ndk-sys = "0.4"

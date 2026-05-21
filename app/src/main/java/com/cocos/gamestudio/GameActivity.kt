@@ -24,7 +24,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import java.io.OutputStream
+import java.io.File
 
 class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
 
@@ -190,14 +190,52 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
         setContentView(root)
         surfaceView.holder.addCallback(this)
 
-        gamePath = intent.getStringExtra("GAME_PATH") ?: ""
+        val requestedPath = intent.getStringExtra("GAME_PATH") ?: ""
+        gamePath = resolveGamePath(requestedPath)
         if (gamePath.isBlank()) {
+            Toast.makeText(this, "Game path is empty.", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+        if (gamePath.contains("assets://")) {
+            Toast.makeText(this, "Could not resolve assets game path.", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
         saveRecentlyPlayed(gamePath)
         startTime = System.currentTimeMillis()
+    }
+
+    private fun resolveGamePath(path: String): String {
+        val virtualAssetPath = path.substringAfter("assets://", "")
+        if (virtualAssetPath.isEmpty()) {
+            return path
+        }
+        if (!path.contains("assets://")) {
+            return path
+        }
+
+        val relative = virtualAssetPath
+        val cachedFile = File(cacheDir, relative)
+        return try {
+            val parent = cachedFile.parentFile
+            if (parent != null && !parent.exists() && !parent.mkdirs()) {
+                return path
+            }
+
+            if (!cachedFile.exists()) {
+                assets.open(relative).use { input ->
+                    cachedFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+            }
+
+            cachedFile.absolutePath
+        } catch (_: Exception) {
+            path
+        }
     }
 
     private fun takeScreenshot() {
@@ -245,6 +283,13 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
 
     override fun surfaceCreated(holder: SurfaceHolder) {
         nativeEngineHandle = NativeEngine.nativeInit(holder.surface, gamePath)
+        if (nativeEngineHandle == 0L) {
+            val initError = NativeEngine.nativeGetInitError()
+            val errorMessage = if (initError.isBlank()) "Unknown init error" else initError
+            Toast.makeText(this, "Native init failed: $errorMessage", Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
         applyEngineSettings()
     }
 
@@ -280,12 +325,16 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
     override fun onPause() {
         super.onPause()
         handler.removeCallbacks(statsUpdater)
-        NativeEngine.nativePause(nativeEngineHandle)
+        if (nativeEngineHandle != 0L) {
+            NativeEngine.nativePause(nativeEngineHandle)
+        }
     }
 
     override fun onResume() {
         super.onResume()
         handler.post(statsUpdater)
-        NativeEngine.nativeResume(nativeEngineHandle)
+        if (nativeEngineHandle != 0L) {
+            NativeEngine.nativeResume(nativeEngineHandle)
+        }
     }
 }
