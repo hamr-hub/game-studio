@@ -50,6 +50,15 @@
                     android:text="Level 5"
                     android:textColor="#666666"
                     android:textSize="14sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/settings_btn"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Engine Settings"
+                    app:icon="@android:drawable/ic_menu_preferences" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -141,5 +150,21 @@
             android:layout_height="wrap_content"
             android:nestedScrollingEnabled="false" />
 
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="12dp"
+            android:text="My Captures"
+            android:textColor="#333333"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/gallery_rv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false" />
+
+        </LinearLayout>
+        </androidx.core.widget.NestedScrollView>

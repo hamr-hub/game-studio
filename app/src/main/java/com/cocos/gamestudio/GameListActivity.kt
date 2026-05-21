@@ -18,6 +18,8 @@ class GameListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_list)
 
+        NativeEngine.nativeSetAssetManager(assets)
+
         val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -46,12 +48,30 @@ class GameListActivity : AppCompatActivity() {
             .commit()
     }
 
-    class GameAdapter(private val myDataset: List<GameEntry>, private val onClick: (GameEntry) -> Unit) :
+    class GameAdapter(private var allGames: List<GameEntry>, private val onClick: (GameEntry) -> Unit) :
         RecyclerView.Adapter<GameAdapter.MyViewHolder>() {
+
+        private var filteredGames: List<GameEntry> = allGames
 
         class MyViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
             val textView: TextView = view.findViewById(R.id.game_name_tv)
             val iconView: TextView = view.findViewById(R.id.game_icon_tv)
+            val sizeView: TextView = view.findViewById(R.id.game_size_tv)
+        }
+
+        fun updateData(newData: List<GameEntry>) {
+            allGames = newData
+            filteredGames = newData
+            notifyDataSetChanged()
+        }
+
+        fun filter(query: String) {
+            filteredGames = if (query.isEmpty()) {
+                allGames
+            } else {
+                allGames.filter { it.displayName.contains(query, ignoreCase = true) }
+            }
+            notifyDataSetChanged()
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -61,7 +81,7 @@ class GameListActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-            val game = myDataset[position]
+            val game = filteredGames[position]
             holder.textView.text = game.displayName
             val bg = GradientDrawable().apply {
                 shape = GradientDrawable.OVAL
@@ -69,9 +89,18 @@ class GameListActivity : AppCompatActivity() {
             }
             holder.iconView.background = bg
             holder.iconView.text = game.iconLabel
+            holder.sizeView.text = formatSize(game.sizeBytes)
             holder.view.setOnClickListener { onClick(game) }
         }
 
-        override fun getItemCount() = myDataset.size
+        override fun getItemCount() = filteredGames.size
+
+        private fun formatSize(bytes: Long): String {
+            if (bytes < 1024) return "$bytes B"
+            val kb = bytes / 1024
+            if (kb < 1024) return "$kb KB"
+            val mb = kb / 1024
+            return String.format("%.1f MB", mb.toFloat())
+        }
     }
 }
