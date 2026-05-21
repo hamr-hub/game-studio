@@ -1,0 +1,55 @@
+name: Android Debug APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build-debug-apk:
+    name: Build debug APK (${{ matrix.abi }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+    strategy:
+      fail-fast: false
+      matrix:
+        abi:
+          - armeabi-v7a
+          - arm64-v8a
+          - x86
+          - x86_64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '26'
+
+      - name: Prepare local Android properties
+        run: |
+          chmod +x ./gradlew
+          echo "sdk.dir=${ANDROID_HOME}" > local.properties
+
+      - name: Build debug APK
+        run: |
+          ./gradlew -Dorg.gradle.java.home="$JAVA_HOME" app:assembleDebug -PtargetAbi=${{ matrix.abi }} -x lint
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: game-studio-debug-${{ matrix.abi }}-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 14

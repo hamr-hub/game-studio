@@ -3,8 +3,7 @@ apply plugin: 'com.android.application'
 android {
     namespace "com.cocos.gamestudio"
     compileSdk 35
-    buildToolsVersion "34.0.0"
-    ndkVersion "29.0.14206865"
+    ndkVersion "28.2.13676358"
     defaultConfig {
         applicationId "com.cocos.gamestudio"
         minSdk 21
@@ -12,6 +11,16 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        def targetAbi = project.findProperty("targetAbi")?.toString()
+        if (targetAbi) {
+            ndk {
+                abiFilters targetAbi
+            }
+        } else {
+            ndk {
+                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+            }
+        }
 
         externalNativeBuild {
             cmake {

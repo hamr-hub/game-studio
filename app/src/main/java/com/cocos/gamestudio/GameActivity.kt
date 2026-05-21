@@ -213,7 +213,6 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
 
     private fun saveBitmapToGallery(bitmap: Bitmap) {
         val filename = "CocosCapture_${System.currentTimeMillis()}.jpg"
-        var fos: OutputStream? = null
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
@@ -226,11 +225,17 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
         val imageUri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
 
         imageUri?.let {
-            fos = contentResolver.openOutputStream(it)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos!!)
-            fos?.close()
-            Toast.makeText(this, "Saved to Gallery", Toast.LENGTH_SHORT).show()
+            contentResolver.openOutputStream(it)?.use { output ->
+                val saved = bitmap.compress(Bitmap.CompressFormat.JPEG, 90, output)
+                if (saved) {
+                    Toast.makeText(this, "Saved to Gallery", Toast.LENGTH_SHORT).show()
+                    return@let
+                }
+            }
+            Toast.makeText(this, "Save to Gallery failed", Toast.LENGTH_SHORT).show()
+            return@let
         }
+        Toast.makeText(this, "Failed to create image entry", Toast.LENGTH_SHORT).show()
     }
 
     private fun saveRecentlyPlayed(path: String) {

@@ -2,24 +2,49 @@
 
 set -euo pipefail
 
-WORKFLOW_FILE="android-debug-ci.yml"
-ARTIFACT_NAME="game-studio-debug-apk"
+WORKFLOW_FILE_DEBUG="android-debug.yml"
+WORKFLOW_FILE_RELEASE="android-release.yml"
+WORKFLOW_FILE="${WORKFLOW_FILE_DEBUG}"
+ARTIFACT_NAME=""
 OUT_DIR="${OUT_DIR:-/tmp/game-studio-ci-apk}"
 RUN_ID=""
 SERIAL=""
 REPO="${REPO:-}"
+BUILD_TYPE="debug"
+TARGET_ABI="arm64-v8a"
 
 usage() {
-  cat <<'EOF'
+  cat <<'USAGE'
 使用方式:
-  ./scripts/fetch_ci_debug_apk.sh [--repo=<owner/repo>] [--run-id=<run-id>] [--serial=<device_serial>]
+  ./scripts/fetch_ci_debug_apk.sh [--repo=<owner/repo>] [--run-id=<run-id>] [--type=<debug|release>] [--abi=<armeabi-v7a|arm64-v8a|x86|x86_64>] [--serial=<device_serial>]
 
 说明:
   - 默认自动读取当前 git 仓库 origin 远端（如 github 上的 owner/repo）
   - 默认下载最近一次成功的 workflow 产物
+  - 默认下载 debug + arm64-v8a
   - 下载后自动安装到 adb 授权设备，并启动 com.cocos.gamestudio/.GameListActivity
-EOF
+USAGE
   exit 1
+}
+
+validate_type() {
+  case "$1" in
+    debug|release)
+      return 0 ;;
+    *)
+      echo "不支持的构建类型: ${1}，仅支持 debug|release"
+      return 1 ;;
+  esac
+}
+
+validate_abi() {
+  case "$1" in
+    armeabi-v7a|arm64-v8a|x86|x86_64)
+      return 0 ;;
+    *)
+      echo "不支持的 ABI: ${1}，支持: armeabi-v7a|arm64-v8a|x86|x86_64"
+      return 1 ;;
+  esac
 }
 
 detect_repo() {
@@ -45,6 +70,12 @@ for arg in "$@"; do
     --run-id=*)
       RUN_ID="${arg#*=}"
       ;;
+    --type=*)
+      BUILD_TYPE="${arg#*=}"
+      ;;
+    --abi=*)
+      TARGET_ABI="${arg#*=}"
+      ;;
     --serial=*)
       SERIAL="${arg#*=}"
       ;;
@@ -57,6 +88,17 @@ for arg in "$@"; do
       ;;
   esac
 done
+
+validate_type "${BUILD_TYPE}"
+validate_abi "${TARGET_ABI}"
+
+if [[ "${BUILD_TYPE}" == "release" ]]; then
+  WORKFLOW_FILE="${WORKFLOW_FILE_RELEASE}"
+else
+  WORKFLOW_FILE="${WORKFLOW_FILE_DEBUG}"
+fi
+
+ARTIFACT_NAME="game-studio-${BUILD_TYPE}-${TARGET_ABI}-apk"
 
 if ! command -v gh >/dev/null 2>&1; then
   echo "未检测到 GitHub CLI (gh)，请先安装并登录 gh"
@@ -76,12 +118,24 @@ if [[ -z "${REPO}" ]]; then
 fi
 
 if [[ -z "${RUN_ID}" ]]; then
-  RUN_ID="$(gh run list --repo "${REPO}" --workflow "${WORKFLOW_FILE}" --limit 20 --json databaseId,conclusion \
-    --jq 'map(select(.conclusion=="success"))[0].databaseId')"
+  RUN_ID="$(gh run list --repo "${REPO}" --workflow "${WORKFLOW_FILE}" --limit 20 --json databaseId,conclusion --jq 'map(select(.conclusion=="success"))[0].databaseId')"
 fi
 
 if [[ -z "${RUN_ID}" || "${RUN_ID}" == "null" ]]; then
   echo "未找到成功的 workflow 执行记录，请先在 GitHub Actions 成功打包一次"
+  exit 1
+fi
+
+AVAILABLE_ARTIFACTS="$(gh run view "${RUN_ID}" --repo "${REPO}" --json artifacts --jq '.artifacts[].name' | cat)"
+if [[ -z "${AVAILABLE_ARTIFACTS}" ]]; then
+  echo "该次运行未产出任何 artifact: ${RUN_ID}"
+  exit 1
+fi
+
+if ! printf '%s\n' "${AVAILABLE_ARTIFACTS}" | grep -Fxq "${ARTIFACT_NAME}"; then
+  echo "未找到目标产物: ${ARTIFACT_NAME}"
+  echo "该 run 可用产物:"
+  printf '%s\n' "${AVAILABLE_ARTIFACTS}"
   exit 1
 fi
 

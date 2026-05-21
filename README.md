@@ -75,20 +75,21 @@ The project is divided into three main layers:
 
 ### GitHub Actions 打包 + 真机安装
 
-项目提供 `.github/workflows/android-debug-ci.yml` 自动化打包。
+项目提供两条独立的 Actions：`android-debug.yml` 与 `android-release.yml`，均支持 `armeabi-v7a/arm64-v8a/x86/x86_64` ABI 产物。
 
-1. 在 GitHub 仓库 Actions 页面触发 `Android Debug Package`（支持手动触发 `workflow_dispatch`）或推送到 `main`/`master` 分支自动触发。
-2. 等待执行成功并确认产物名 `game-studio-debug-apk` 已上传。
-3. 使用脚本下载最新成功产物并安装到真机（需先 `gh auth login`）：
+1. 在 GitHub 仓库 Actions 页面分别触发 `Android Debug APK` 或 `Android Release APK`（支持手动触发 `workflow_dispatch`）或推送到 `main`/`master` 分支自动触发。
+2. 等待执行成功并确认产物名 `game-studio-<debug|release>-<abi>-apk` 已上传（例如 `game-studio-debug-arm64-v8a-apk`）。
+3. 使用脚本下载并安装到真机（需先 `gh auth login`）：
 
 ```bash
 ./scripts/fetch_ci_debug_apk.sh
 ./scripts/fetch_ci_debug_apk.sh --serial=<device_serial>
-./scripts/fetch_ci_debug_apk.sh --repo=<owner/repo> --run-id=<run_id>
+./scripts/fetch_ci_debug_apk.sh --type=debug --abi=arm64-v8a
+./scripts/fetch_ci_debug_apk.sh --type=release --abi=x86_64 --serial=<device_serial> --run-id=<run_id>
 ```
 
 脚本行为：
-- 自动下载最近一次成功构建中的 `app-debug.apk`
+- 默认下载最近一次成功构建中的 `arm64-v8a debug` 包
 - 自动选择连接中的设备（或使用 `--serial` 指定）
 - 安装后启动 `com.cocos.gamestudio/.GameListActivity`
 
@@ -97,6 +98,7 @@ The project is divided into three main layers:
 ```bash
 ./scripts/debug_android.sh
 ./scripts/debug_android.sh --serial=<device_serial>
+./scripts/debug_android.sh --type=release --abi=arm64-v8a --serial=<device_serial>
 ./scripts/debug_android.sh --sdcard
 ./scripts/debug_android.sh --serial=<device_serial> --sdcard
 ./scripts/debug_android.sh --logcat

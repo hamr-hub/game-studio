@@ -9,6 +9,8 @@ PUSH_TO_SDCARD=false
 ENABLE_LOGCAT=false
 LOGCAT_FILTER="com.cocos.gamestudio"
 SERIAL=""
+BUILD_TYPE="debug"
+TARGET_ABI="arm64-v8a"
 
 DEFAULT_JDK_DIR="${HOME}/codespace/jdk/jdk-26.0.1+8"
 ANDROID_SDK_DIR="${HOME}/codespace/android-sdk"
@@ -84,6 +86,20 @@ if [[ -n "${AAPT2_BIN:-}" && -x "$AAPT2_BIN" ]]; then
   GRADLE_AAPT2_ARG=("-P" "android.aapt2FromMavenOverride=$AAPT2_BIN")
 fi
 
+validate_type() {
+  case "$1" in
+    debug|release) return 0 ;;
+    *) echo "不支持的构建类型: ${1}（仅支持 debug|release）"; return 1 ;;
+  esac
+}
+
+validate_abi() {
+  case "$1" in
+    armeabi-v7a|arm64-v8a|x86|x86_64) return 0 ;;
+    *) echo "不支持的 ABI: ${1}，支持: armeabi-v7a|arm64-v8a|x86|x86_64"; return 1 ;;
+  esac
+}
+
 if [[ ! -x "$ADB_BIN" ]]; then
   echo "未找到 adb，请先安装 Android SDK Platform-Tools（>= 37.0.0）"
   exit 1
@@ -94,6 +110,12 @@ for arg in "$@"; do
     --sdcard)
       PUSH_TO_SDCARD=true
       ;;
+    --type=*)
+      BUILD_TYPE="${arg#*=}"
+      ;;
+    --abi=*)
+      TARGET_ABI="${arg#*=}"
+      ;;
     --logcat)
       ENABLE_LOGCAT=true
       ;;
@@ -102,19 +124,22 @@ for arg in "$@"; do
       LOGCAT_FILTER="${arg#--logcat=}"
       ;;
     --serial=*)
-      SERIAL="${arg#--serial=}"
+      SERIAL="${arg#*=}"
       ;;
     *)
       if [[ -z "$SERIAL" ]]; then
         SERIAL="$arg"
       else
         echo "未知参数: $arg"
-        echo "用法: ./scripts/debug_android.sh [--serial=<序列号>] [--sdcard] [--logcat|--logcat=<过滤关键字>]"
+        echo "用法: ./scripts/debug_android.sh [--type=debug|release] [--abi=armeabi-v7a|arm64-v8a|x86|x86_64] [--serial=<序列号>] [--sdcard] [--logcat|--logcat=<过滤关键字>]"
         exit 1
       fi
       ;;
   esac
 done
+
+validate_type "${BUILD_TYPE}"
+validate_abi "${TARGET_ABI}"
 
 java_version_line="$("$JAVA_BIN" -version 2>&1 | awk -F '\"' '/version/ {print $2; exit}')"
 java_major="$(echo "$java_version_line" | awk -F. '{print $1}')"
@@ -143,12 +168,14 @@ else
   GRADLE_CMD="./gradlew"
 fi
 
-echo "开始构建 Debug APK..."
-"$GRADLE_CMD" app:assembleDebug -x lint "${GRADLE_AAPT2_ARG[@]}"
+APK_TASK="assemble${BUILD_TYPE^}"
+echo "开始构建 ${BUILD_TYPE} APK（ABI: ${TARGET_ABI}）..."
+"$GRADLE_CMD" "app:${APK_TASK}" -PtargetAbi="${TARGET_ABI}" -x lint "${GRADLE_AAPT2_ARG[@]}"
 
-APK_PATH="app/build/outputs/apk/debug/app-debug.apk"
+APK_PATH="app/build/outputs/apk/${BUILD_TYPE}/app-${BUILD_TYPE}.apk"
 if [[ ! -f "$APK_PATH" ]]; then
   echo "未生成 APK：$APK_PATH"
+  echo "若为 release 构建，请确认已配置签名并可供打包，否则可先尝试 --type=debug"
   exit 1
 fi
 
@@ -168,8 +195,8 @@ if [[ "$PUSH_TO_SDCARD" == true ]]; then
 fi
 
 echo "安装并启动应用（设备: $SERIAL）..."
-  "$ADB_BIN" -s "$SERIAL" install -r "$APK_PATH"
-  "$ADB_BIN" -s "$SERIAL" shell am start -n com.cocos.gamestudio/.GameListActivity
+"$ADB_BIN" -s "$SERIAL" install -r "$APK_PATH"
+"$ADB_BIN" -s "$SERIAL" shell am start -n com.cocos.gamestudio/.GameListActivity
 
 echo "完成：${APK_PATH} 已安装并启动"
 
