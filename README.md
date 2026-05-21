@@ -75,10 +75,10 @@ The project is divided into three main layers:
 
 ### GitHub Actions 打包 + 真机安装
 
-项目提供两条独立的 Actions：`android-debug.yml` 与 `android-release.yml`，均支持 `armeabi-v7a/arm64-v8a/x86/x86_64` ABI 产物。
+项目提供两条独立的 Actions：`android-debug.yml` 与 `android-release.yml`，默认面向 64 位 ABI（`arm64-v8a`、`x86_64`）。
 
 1. 在 GitHub 仓库 Actions 页面分别触发 `Android Debug APK` 或 `Android Release APK`（支持手动触发 `workflow_dispatch`）或推送到 `main`/`master` 分支自动触发。
-2. 等待执行成功并确认产物名 `game-studio-<debug|release>-<abi>-apk` 已上传（例如 `game-studio-debug-arm64-v8a-apk`）。
+2. 等待执行成功并确认产物名 `game-studio-<debug|release>-<abi>-apk` 已上传（如 `game-studio-debug-arm64-v8a-apk`、`game-studio-release-x86_64-apk`）。
 3. 使用脚本下载并安装到真机（需先 `gh auth login`）：
 
 ```bash

@@ -95,8 +95,8 @@ validate_type() {
 
 validate_abi() {
   case "$1" in
-    armeabi-v7a|arm64-v8a|x86|x86_64) return 0 ;;
-    *) echo "不支持的 ABI: ${1}，支持: armeabi-v7a|arm64-v8a|x86|x86_64"; return 1 ;;
+    arm64-v8a|x86_64) return 0 ;;
+    *) echo "不支持的 ABI: ${1}，支持: arm64-v8a|x86_64"; return 1 ;;
   esac
 }
 
@@ -131,7 +131,7 @@ for arg in "$@"; do
         SERIAL="$arg"
       else
         echo "未知参数: $arg"
-        echo "用法: ./scripts/debug_android.sh [--type=debug|release] [--abi=armeabi-v7a|arm64-v8a|x86|x86_64] [--serial=<序列号>] [--sdcard] [--logcat|--logcat=<过滤关键字>]"
+        echo "用法: ./scripts/debug_android.sh [--type=debug|release] [--abi=arm64-v8a|x86_64] [--serial=<序列号>] [--sdcard] [--logcat|--logcat=<过滤关键字>]"
         exit 1
       fi
       ;;

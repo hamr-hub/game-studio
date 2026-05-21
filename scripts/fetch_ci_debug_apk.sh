@@ -16,7 +16,7 @@ TARGET_ABI="arm64-v8a"
 usage() {
   cat <<'USAGE'
 使用方式:
-  ./scripts/fetch_ci_debug_apk.sh [--repo=<owner/repo>] [--run-id=<run-id>] [--type=<debug|release>] [--abi=<armeabi-v7a|arm64-v8a|x86|x86_64>] [--serial=<device_serial>]
+  ./scripts/fetch_ci_debug_apk.sh [--repo=<owner/repo>] [--run-id=<run-id>] [--type=<debug|release>] [--abi=<arm64-v8a|x86_64>] [--serial=<device_serial>]
 
 说明:
   - 默认自动读取当前 git 仓库 origin 远端（如 github 上的 owner/repo）
@@ -39,10 +39,10 @@ validate_type() {
 
 validate_abi() {
   case "$1" in
-    armeabi-v7a|arm64-v8a|x86|x86_64)
+    arm64-v8a|x86_64)
       return 0 ;;
     *)
-      echo "不支持的 ABI: ${1}，支持: armeabi-v7a|arm64-v8a|x86|x86_64"
+      echo "不支持的 ABI: ${1}，支持: arm64-v8a|x86_64"
       return 1 ;;
   esac
 }
