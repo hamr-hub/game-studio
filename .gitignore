@@ -1,0 +1,19 @@
+# .gitignore for Android and Rust project
+
+# Gradle
+.gradle/
+build/
+app/build/
+
+# Rust/Cargo
+native/target/
+native/Cargo.lock
+
+# IDEs
+.idea/
+*.iml
+*.swp
+*.swo
+
+# OS
+.DS_Store
