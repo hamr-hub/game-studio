@@ -74,7 +74,7 @@ object GameCatalog {
     private fun listFromFileSystem(dir: File): List<GameEntry> {
         if (!dir.exists() || !dir.isDirectory) return emptyList()
         val files = dir.listFiles { _, name -> name.endsWith(".zip", ignoreCase = true) } ?: return emptyList()
-        return files.sortedBy { it.name.lowercase() }.map(::toEntry)
+        return files.sortedBy { it.name.lowercase() }.map { toEntry(context = null, file = it) }
     }
 
     private fun listFromAssets(context: Context): List<GameEntry> {
@@ -90,15 +90,25 @@ object GameCatalog {
             .sortedBy { it.lowercase() }
             .map { name ->
                 val virtualFile = File("assets://$ASSET_GAMES_DIR/$name")
-                toEntry(virtualFile)
+                toEntry(context, virtualFile)
             }
     }
 
-    private fun toEntry(file: File): GameEntry {
+    private fun toEntry(context: Context?, file: File): GameEntry {
         val name = if (file.absolutePath.startsWith("assets://")) {
             file.absolutePath.substringAfterLast("/")
         } else {
             file.name
+        }
+        val size = if (file.absolutePath.startsWith("assets://") && context != null) {
+            try {
+                val assetPath = file.absolutePath.removePrefix("assets://").trimStart('/')
+                context.assets.open(assetPath).use { it.available().toLong() }
+            } catch (_: Exception) {
+                0L
+            }
+        } else {
+            file.length()
         }
         val raw = name.substringBeforeLast(".zip", name)
         val displayName = raw
@@ -109,9 +119,6 @@ object GameCatalog {
             .ifBlank { "Mini Game" }
         val color = iconColors[(raw.hashCode() and Int.MAX_VALUE) % iconColors.size]
         val iconLabel = displayName.firstOrNull()?.uppercaseChar()?.toString() ?: "G"
-        // For assets, length might need to be fetched via AssetManager if critical, 
-        // using 0 for now as a placeholder for virtual files
-        val size = if (file.absolutePath.startsWith("assets://")) 0L else file.length()
         return GameEntry(file, displayName, iconLabel, color, size)
     }
 }

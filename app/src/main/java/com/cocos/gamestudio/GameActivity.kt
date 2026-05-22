@@ -1,6 +1,7 @@
 package com.cocos.gamestudio
 
 import android.content.ContentValues
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Build
@@ -24,7 +25,6 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import java.io.File
 
 class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
 
@@ -41,6 +41,7 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
     private var nativeEngineHandle: Long = 0
     private var startTime: Long = 0
     private var gamePath: String = ""
+    private var requestedPath: String = ""
     
     private val handler = Handler(Looper.getMainLooper())
     private val statsUpdater = object : Runnable {
@@ -190,16 +191,15 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
         setContentView(root)
         surfaceView.holder.addCallback(this)
 
-        val requestedPath = intent.getStringExtra("GAME_PATH") ?: ""
-        gamePath = resolveGamePath(requestedPath)
+        requestedPath = intent.getStringExtra("GAME_PATH") ?: ""
+        gamePath = requestedPath
         if (gamePath.isBlank()) {
             Toast.makeText(this, "Game path is empty.", Toast.LENGTH_SHORT).show()
-            finish()
+            fallbackToWebRuntime("Could not resolve requested game path.")
             return
         }
-        if (gamePath.contains("assets://")) {
-            Toast.makeText(this, "Could not resolve assets game path.", Toast.LENGTH_SHORT).show()
-            finish()
+        if (!gamePath.startsWith("assets://") && !java.io.File(gamePath).exists()) {
+            fallbackToWebRuntime("Game path does not exist.")
             return
         }
 
@@ -207,35 +207,18 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
         startTime = System.currentTimeMillis()
     }
 
-    private fun resolveGamePath(path: String): String {
-        val virtualAssetPath = path.substringAfter("assets://", "")
-        if (virtualAssetPath.isEmpty()) {
-            return path
+    private fun fallbackToWebRuntime(reason: String) {
+        allLogs.add("Falling back to web runtime: $reason")
+        refreshConsole()
+        if (nativeEngineHandle != 0L) {
+            NativeEngine.nativeDestroy(nativeEngineHandle)
+            nativeEngineHandle = 0L
         }
-        if (!path.contains("assets://")) {
-            return path
-        }
-
-        val relative = virtualAssetPath
-        val cachedFile = File(cacheDir, relative)
-        return try {
-            val parent = cachedFile.parentFile
-            if (parent != null && !parent.exists() && !parent.mkdirs()) {
-                return path
-            }
-
-            if (!cachedFile.exists()) {
-                assets.open(relative).use { input ->
-                    cachedFile.outputStream().use { output ->
-                        input.copyTo(output)
-                    }
-                }
-            }
-
-            cachedFile.absolutePath
-        } catch (_: Exception) {
-            path
-        }
+        val targetPath = if (requestedPath.isBlank()) gamePath else requestedPath
+        startActivity(Intent(this, WebGameActivity::class.java).apply {
+            putExtra("GAME_PATH", targetPath)
+        })
+        finish()
     }
 
     private fun takeScreenshot() {
@@ -281,13 +264,35 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
         GameCatalog.addToRecent(prefs, path)
     }
 
+    private fun shouldFallbackToWebRuntime(bootstrapStatus: String): Boolean {
+        if (bootstrapStatus.isBlank()) return true
+        val code = bootstrapStatus.substringBefore('|').trim()
+        return when (code) {
+            "STARTED" -> false
+            "STARTED_SIMULATED" -> true
+            else -> true
+        }
+    }
+
     override fun surfaceCreated(holder: SurfaceHolder) {
         nativeEngineHandle = NativeEngine.nativeInit(holder.surface, gamePath)
         if (nativeEngineHandle == 0L) {
             val initError = NativeEngine.nativeGetInitError()
             val errorMessage = if (initError.isBlank()) "Unknown init error" else initError
+            allLogs.add("Native init failed: $errorMessage")
+            refreshConsole()
             Toast.makeText(this, "Native init failed: $errorMessage", Toast.LENGTH_LONG).show()
-            finish()
+            fallbackToWebRuntime("Native init failed: $errorMessage")
+            return
+        }
+        val packageSummary = NativeEngine.nativeGetPackageSummary(nativeEngineHandle)
+        if (packageSummary.isNotBlank()) {
+            allLogs.add("Package summary: $packageSummary")
+            refreshConsole()
+        }
+        val bootstrapStatus = NativeEngine.nativeGetBootstrapStatus(nativeEngineHandle)
+        if (shouldFallbackToWebRuntime(bootstrapStatus)) {
+            fallbackToWebRuntime("Native bootstrap unsupported or incomplete: $bootstrapStatus")
             return
         }
         applyEngineSettings()

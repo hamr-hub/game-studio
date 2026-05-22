@@ -29,6 +29,12 @@
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
 
         <activity
+            android:name=".WebGameActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|keyboardHidden|screenSize|screenLayout|smallestScreenSize"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+
+        <activity
             android:name=".SettingsActivity"
             android:label="Engine Settings"
             android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />

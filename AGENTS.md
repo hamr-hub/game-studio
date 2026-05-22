@@ -137,3 +137,15 @@ The Game Studio project has been optimized with several advanced features:
 4. **日志控制台**：点击左下角按钮开启日志，点击过滤器（INFO/WARN/ERROR）验证配色与过滤。
 5. **设置中心**：在 Profile -> Settings 中修改 FPS 限制，返回游戏观察 FPS 监控变化。
 6. **相册系统**：在游戏内截图，返回 Profile -> My Captures 查看预览图。
+
+## 交付与验收约束
+
+- 每次主流程验收前必须更新：
+  - `docs/acceptance_plan.md`
+  - `docs/acceptance_report_*.md`
+- 集成调试统一走 GitHub Actions：
+  - 真机验证前不得执行本地 `assemble*` 构建。
+  - 仅使用 `gh workflow run ...` 与 `./scripts/fetch_ci_debug_apk.sh` 拉取 artifact 安装。
+- 任何 `assets://` 游戏路径变更须在验收报告记录：
+  - 原生是否返回 `STARTED`，
+  - 是否成功触发回退分支（如为 `STARTED_SIMULATED`）。

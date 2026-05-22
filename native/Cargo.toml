@@ -9,13 +9,17 @@ crate-type = ["cdylib"]
 [dependencies]
 jni = "0.21"
 cocos4-rust = { path = "../../cocos4-rust" }
-ndk = { version = "0.7", features = ["asset"] }
-ndk-glue = "0.7"
-ndk-sys = "0.4"
 zip = "0.6"
+lazy_static = "1.4"
 raw-window-handle = "0.5"
-android_logger = "0.13"
 log = "0.4"
 
 [features]
-default = []
+default = ["js-runtime-mock", "js-runtime-real"]
+js-runtime-mock = ["cocos4-rust/js-runtime-mock"]
+js-runtime-real = ["cocos4-rust/js-runtime-real"]
+
+[target.'cfg(target_os = "android")'.dependencies]
+ndk = { version = "0.7" }
+ndk-sys = "0.4"
+android_logger = "0.13"

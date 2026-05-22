@@ -16,6 +16,8 @@ object NativeEngine {
     external fun nativeResume(handle: Long)
     external fun nativeGetPerformanceStats(handle: Long): String
     external fun nativeGetInitError(): String
+    external fun nativeGetPackageSummary(handle: Long): String
+    external fun nativeGetBootstrapStatus(handle: Long): String
     external fun nativeUpdateSettings(handle: Long, fpsLimit: Int, enableShadows: Boolean)
     external fun nativeGetLogs(handle: Long): Array<String>
 }
