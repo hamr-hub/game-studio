@@ -44,6 +44,40 @@ jobs:
         run: |
           rustup target add aarch64-linux-android x86_64-linux-android armv7-linux-androideabi i686-linux-android
 
+      - name: Prepare Android toolchain for cargo
+        run: |
+          NDK_DIR="${ANDROID_HOME}/ndk/$(ls -1 "${ANDROID_HOME}/ndk" | sort -V | tail -n 1)"
+          TOOLCHAIN_BIN="${NDK_DIR}/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          mkdir -p "${TOOLCHAIN_BIN}"
+          echo "${TOOLCHAIN_BIN}" >> "${GITHUB_PATH}"
+
+          make_tool_link() {
+            local triple="$1"
+            local tool="$2"
+            local direct_tool="${TOOLCHAIN_BIN}/${triple}-${tool}"
+            local candidate
+
+            if [ -x "${TOOLCHAIN_BIN}/${triple}33-${tool}" ]; then
+              candidate="${TOOLCHAIN_BIN}/${triple}33-${tool}"
+            elif [ -x "${TOOLCHAIN_BIN}/${triple}21-${tool}" ]; then
+              candidate="${TOOLCHAIN_BIN}/${triple}21-${tool}"
+            else
+              candidate=$(find "${TOOLCHAIN_BIN}" -maxdepth 1 -type f -name "${triple}*-${tool}" -executable 2>/dev/null | sort -V | tail -n 1)
+            fi
+
+            if [ -z "${candidate}" ] || [ ! -x "${candidate}" ]; then
+              echo "Missing Android toolchain for ${triple}-${tool}" >&2
+              exit 1
+            fi
+
+            ln -sf "${candidate}" "${direct_tool}"
+          }
+
+          for triple in aarch64-linux-android x86_64-linux-android armv7a-linux-androideabi i686-linux-android; do
+            make_tool_link "$triple" "clang"
+            make_tool_link "$triple" "clang++"
+          done
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
