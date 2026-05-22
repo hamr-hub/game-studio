@@ -74,11 +74,13 @@ def stagedRustLibDir = file("${buildDir}/rust-libs/${targetAbi}")
 def rustLibName = "libcocos_studio.so"
 def nativeLibPath = file("${rustTargetDir}/${rustTarget}/release/${rustLibName}")
 
-tasks.register("prepareRustLib") {
+def prepareRustLibTask = tasks.register("prepareRustLib") {
     group = "build"
     description = "Builds cocos_studio Rust library and stages it into AGP jniLibs directory for packaging."
 
     outputs.dir(stagedRustLibDir)
+    inputs.property("targetAbi", targetAbi)
+    inputs.property("rustTarget", rustTarget)
 
     doLast {
         if (!supportedRustTargets.containsKey(targetAbi)) {
@@ -101,9 +103,12 @@ tasks.register("prepareRustLib") {
     }
 }
 
-tasks.whenTaskAdded { task ->
-    if (task.name.startsWith("merge") && task.name.endsWith("NativeLibs")) {
-        task.dependsOn(tasks.named("prepareRustLib"))
+tasks.matching { task ->
+    task.name in ["mergeDebugJniLibFolders", "mergeReleaseJniLibFolders", "mergeDebugNativeLibs", "mergeReleaseNativeLibs"]
+}.configureEach {
+    dependsOn(prepareRustLibTask)
+    inputs.dir(stagedRustLibDir)
+}
     }
 }
 
