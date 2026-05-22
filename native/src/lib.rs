@@ -10,6 +10,7 @@ use std::collections::VecDeque;
 use std::fs::{self, File};
 use std::io::{Cursor, Read};
 use std::path::{Path, PathBuf};
+use std::ffi::CString;
 use std::sync::{
     atomic::{AtomicBool, Ordering},
     Arc, Mutex,
@@ -219,7 +220,7 @@ impl GamePackageInfo {
                 self.main_entry_candidates.join(" | "),
             ),
             (
-                "bootstrap_has_project_json",
+                "bootstrap_has_project_json".to_string(),
                 if self.has_project_json {
                     "1".to_string()
                 } else {
@@ -227,7 +228,7 @@ impl GamePackageInfo {
                 },
             ),
             (
-                "bootstrap_has_settings_json",
+                "bootstrap_has_settings_json".to_string(),
                 if self.has_settings_json {
                     "1".to_string()
                 } else {
@@ -235,7 +236,7 @@ impl GamePackageInfo {
                 },
             ),
             (
-                "bootstrap_has_settings_js",
+                "bootstrap_has_settings_js".to_string(),
                 if self.has_settings_js {
                     "1".to_string()
                 } else {
@@ -243,7 +244,7 @@ impl GamePackageInfo {
                 },
             ),
             (
-                "bootstrap_has_main_js",
+                "bootstrap_has_main_js".to_string(),
                 if self.has_main_js {
                     "1".to_string()
                 } else {
@@ -251,7 +252,7 @@ impl GamePackageInfo {
                 },
             ),
             (
-                "bootstrap_has_src_main_index_js",
+                "bootstrap_has_src_main_index_js".to_string(),
                 if self.has_src_main_index_js {
                     "1".to_string()
                 } else {
@@ -259,7 +260,7 @@ impl GamePackageInfo {
                 },
             ),
             (
-                "bootstrap_has_application_js",
+                "bootstrap_has_application_js".to_string(),
                 if self.has_application_js {
                     "1".to_string()
                 } else {
@@ -573,7 +574,7 @@ fn read_text_from_zip_bytes(data: &[u8], entry: &str) -> Option<String> {
         if name.is_empty() {
             continue;
         }
-        if let Ok(mut reader) = archive.by_name(name) {
+        if let Ok(mut reader) = archive.by_name(&name) {
             let mut bytes = Vec::new();
             reader.read_to_end(&mut bytes).ok()?;
             if bytes.is_empty() {
@@ -602,7 +603,19 @@ fn read_asset_file_bytes(asset_path: &str) -> Option<Vec<u8>> {
     let manager = manager.as_ref()?;
 
     let cleaned = asset_path.trim_start_matches('/');
-    let mut asset = match manager.open(cleaned) {
+    let cleaned = match CString::new(cleaned) {
+        Ok(path) => path,
+        Err(_) => {
+            add_to_log(
+                Level::Warn,
+                &format!(
+                    "Failed to build C string for asset '{cleaned}' from AssetManager",
+                ),
+            );
+            return None;
+        }
+    };
+    let mut asset = match manager.open(&cleaned) {
         Some(asset) => asset,
         None => {
             add_to_log(
@@ -1013,7 +1026,7 @@ impl EngineRuntime {
             &format!(
                 "Bootstrap accepted for style '{}' entry '{}'.",
                 native_style,
-                contract.main_entry.unwrap_or_else(|| "<none>".to_string())
+                contract.main_entry.as_deref().unwrap_or("<none>")
             ),
         );
     }
