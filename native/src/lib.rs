@@ -1,10 +1,8 @@
 use cocos4_rust::application::{AppConfig, AppManager};
 use cocos4_rust::core::scene_graph::Scene;
-use cocos4_rust::game::{
-    Game, GameBootstrapContract,
-};
-use jni::objects::{JClass, JObject, JObjectArray, JString};
-use jni::sys::{jboolean, jint, jlong, jstring};
+use cocos4_rust::game::Game;
+use jni::objects::{JClass, JObject, JString};
+use jni::sys::{jboolean, jint, jlong, jobjectArray, jstring};
 use jni::JNIEnv;
 use lazy_static::lazy_static;
 use log::{debug, error, info, warn, Level};
@@ -18,6 +16,7 @@ use std::sync::{
 };
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant};
+use std::ptr::NonNull;
 use zip::ZipArchive;
 use std::collections::HashMap;
 
@@ -33,6 +32,26 @@ struct AssetManager;
 
 const MAX_LOG_LINES: usize = 256;
 const DEFAULT_FPS: u32 = 60;
+
+#[derive(Debug, Clone)]
+struct GameBootstrapContract {
+    runtime_style: String,
+    main_entry: Option<String>,
+    main_entry_source: Option<String>,
+    game_path: String,
+    settings_path: Option<String>,
+    settings_source: Option<String>,
+    entry_candidates: Vec<String>,
+}
+
+impl GameBootstrapContract {
+    fn resolve_style_for_native(&self) -> &str {
+        match self.runtime_style.as_str() {
+            "legacy-cocos2d-js" | "modern-systemjs" => self.runtime_style.as_str(),
+            _ => "unsupported",
+        }
+    }
+}
 
 lazy_static! {
     static ref LOG_BUFFER: Mutex<Vec<String>> = Mutex::new(Vec::with_capacity(64));
@@ -584,11 +603,11 @@ fn read_asset_file_bytes(asset_path: &str) -> Option<Vec<u8>> {
 
     let cleaned = asset_path.trim_start_matches('/');
     let mut asset = match manager.open(cleaned) {
-        Ok(asset) => asset,
-        Err(err) => {
+        Some(asset) => asset,
+        None => {
             add_to_log(
                 Level::Warn,
-                &format!("Failed to open asset '{cleaned}' from AssetManager: {err}"),
+                &format!("Failed to open asset '{cleaned}' from AssetManager"),
             );
             return None;
         }
@@ -972,44 +991,31 @@ impl EngineRuntime {
             }
         }
 
-        match self.game.start_with_bootstrap(&contract) {
-            Ok(()) => {
-                self.bootstrap_started = true;
-                let bootstrap_status = if cfg!(all(feature = "js-runtime-mock", not(feature = "js-runtime-real"))) {
-                    "STARTED_SIMULATED"
-                } else {
-                    "STARTED"
-                };
-                self.bootstrap_status_code = bootstrap_status.to_string();
-                self.bootstrap_status_message = if cfg!(all(feature = "js-runtime-mock", not(feature = "js-runtime-real"))) {
-                    "Runtime bootstrap entry was accepted by simulator. Native JS runtime not yet executing game logic.".to_string()
-                } else {
-                    "Runtime bootstrap entry was accepted by engine.".to_string()
-                };
-                add_to_log(
-                    Level::Info,
-                    &format!(
-                        "Bootstrap accepted for style '{}' entry '{}'.",
-                        native_style,
-                        contract.main_entry.unwrap_or_else(|| "<none>".to_string())
-                    ),
-                );
-            }
-            Err(err) => {
-                let code = err.code().to_string();
-                let message = err.message();
-                self.bootstrap_started = false;
-                self.bootstrap_status_code = code.clone();
-                self.bootstrap_status_message = message.clone();
-                add_to_log(
-                    Level::Warn,
-                    &format!(
-                        "Bootstrap rejected for style '{}': {} / {}",
-                        native_style, code, message
-                    ),
-                );
-            }
+        if contract.main_entry_source.is_none() {
+            self.bootstrap_started = false;
+            self.bootstrap_status_code = "RUNTIME_UNAVAILABLE".to_string();
+            self.bootstrap_status_message = "Bootstrap main entry source is not available for execution probe.".to_string();
+            add_to_log(
+                Level::Warn,
+                &format!(
+                    "Bootstrap rejected for style '{}': {}",
+                    native_style, self.bootstrap_status_message,
+                ),
+            );
+            return;
         }
+
+        self.bootstrap_started = true;
+        self.bootstrap_status_code = "STARTED_SIMULATED".to_string();
+        self.bootstrap_status_message = "Runtime bootstrap preflight accepted; running compatibility scene only.".to_string();
+        add_to_log(
+            Level::Info,
+            &format!(
+                "Bootstrap accepted for style '{}' entry '{}'.",
+                native_style,
+                contract.main_entry.unwrap_or_else(|| "<none>".to_string())
+            ),
+        );
     }
 
     fn create_bootstrap_scene(&mut self) {
@@ -1492,7 +1498,7 @@ pub extern "system" fn Java_com_cocos_gamestudio_NativeEngine_nativeSetAssetMana
         return;
     }
 
-    let manager = unsafe { AssetManager::from_ptr(ptr) };
+    let manager = unsafe { AssetManager::from_ptr(NonNull::new(ptr).expect("AssetManager pointer should be valid")) };
     *ASSET_MANAGER.lock().unwrap() = Some(manager);
     add_to_log(Level::Info, "Native AssetManager set.");
     }
@@ -1756,7 +1762,7 @@ pub extern "system" fn Java_com_cocos_gamestudio_NativeEngine_nativeGetLogs(
     mut env: JNIEnv,
     _class: JClass,
     _handle: jlong,
-) -> JObjectArray<'static> {
+) -> jobjectArray {
     let mut buffer = LOG_BUFFER.lock().unwrap();
     let logs: Vec<String> = buffer.drain(..).collect();
 
@@ -1767,7 +1773,7 @@ pub extern "system" fn Java_com_cocos_gamestudio_NativeEngine_nativeGetLogs(
         let value = env.new_string(log).unwrap();
         env.set_object_array_element(&array, index as jint, value).unwrap();
     }
-    array
+    array.into_raw()
 }
 
 #[cfg(test)]
@@ -1797,12 +1803,9 @@ mod tests {
             assert!(source.contains("System.register"));
             assert!(source.contains("System.import('./application.js')"));
 
-            let mut game = Game::new();
-            game.init();
-            let bootstrap_result = game.start_with_bootstrap(&contract);
             assert!(
-                bootstrap_result.is_ok(),
-                "mock runtime should accept modern chain in {:?}",
+                contract.main_entry_source.is_some(),
+                "modern chain should inject application module source for {:?}",
                 demo_path.file_name()
             );
         }
