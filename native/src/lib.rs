@@ -1266,6 +1266,11 @@ fn analyze_game_asset_package(path_str: &str) -> Result<GamePackageInfo, String>
         return Err("Invalid assets URI for game package".to_string());
     }
 
+    add_to_log(
+        Level::Info,
+        &format!("Game path resolved from AssetManager: {relative}"),
+    );
+
     let bytes = read_asset_file_bytes(relative)
         .ok_or_else(|| format!("Failed to open game package from assets: {path_str}"))?;
     let result = analyze_game_archive_from_bytes(path_str, &bytes)?;
