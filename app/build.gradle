@@ -87,7 +87,7 @@ def prepareRustLibTask = tasks.register("prepareRustLib") {
             throw new GradleException("Unsupported targetAbi '${targetAbi}'. Supported: ${supportedRustTargets.keySet()}")
         }
 
-        exec {
+        project.exec {
             workingDir nativeCargoDir
             commandLine "cargo", "build", "--manifest-path", "${nativeCargoDir}/Cargo.toml", "--target", rustTarget, "--release"
         }
