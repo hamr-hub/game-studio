@@ -51,6 +51,28 @@ jobs:
           mkdir -p "${TOOLCHAIN_BIN}"
           echo "${TOOLCHAIN_BIN}" >> "${GITHUB_PATH}"
 
+          case "${{ matrix.abi }}" in
+            arm64-v8a)
+              TARGET_TRIPLE="aarch64-linux-android"
+              ;;
+            x86_64)
+              TARGET_TRIPLE="x86_64-linux-android"
+              ;;
+            armeabi-v7a)
+              TARGET_TRIPLE="armv7a-linux-androideabi"
+              ;;
+            x86)
+              TARGET_TRIPLE="i686-linux-android"
+              ;;
+            *)
+              echo "Unsupported ABI: ${{ matrix.abi }}" >&2
+              exit 1
+              ;;
+          esac
+
+          TARGET_LINKER=""
+          TARGET_LINKER_CPP=""
+
           make_tool_link() {
             local triple="$1"
             local tool="$2"
@@ -71,12 +93,32 @@ jobs:
             fi
 
             ln -sf "${candidate}" "${direct_tool}"
+            if [ "${triple}" = "${TARGET_TRIPLE}" ]; then
+              echo "${candidate}"
+            else
+              echo ""
+            fi
           }
 
           for triple in aarch64-linux-android x86_64-linux-android armv7a-linux-androideabi i686-linux-android; do
-            make_tool_link "$triple" "clang"
-            make_tool_link "$triple" "clang++"
+            clang_path=$(make_tool_link "$triple" "clang")
+            clangpp_path=$(make_tool_link "$triple" "clang++")
+            if [ "${triple}" = "${TARGET_TRIPLE}" ]; then
+              TARGET_LINKER="${clang_path}"
+              TARGET_LINKER_CPP="${clangpp_path}"
+            fi
           done
+
+          if [ -z "${TARGET_LINKER}" ] || [ -z "${TARGET_LINKER_CPP}" ]; then
+            echo "Missing Android toolchain linker for ${TARGET_TRIPLE}" >&2
+            exit 1
+          fi
+
+          TARGET_ENV="${TARGET_TRIPLE//-/_}"
+          TARGET_ENV="${TARGET_ENV^^}"
+          echo "CC=${TARGET_LINKER}" >> "${GITHUB_ENV}"
+          echo "CXX=${TARGET_LINKER_CPP}" >> "${GITHUB_ENV}"
+          echo "CARGO_TARGET_${TARGET_ENV}_LINKER=${TARGET_LINKER}" >> "${GITHUB_ENV}"
 
       - name: Setup JDK
         uses: actions/setup-java@v4
