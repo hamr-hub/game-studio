@@ -40,6 +40,10 @@ jobs:
           mkdir -p "${GITHUB_WORKSPACE}/.."
           ln -sfn "${GITHUB_WORKSPACE}/cocos4-rust" "${GITHUB_WORKSPACE}/../cocos4-rust"
 
+      - name: Prepare Rust targets
+        run: |
+          rustup target add aarch64-linux-android x86_64-linux-android armv7-linux-androideabi i686-linux-android
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
