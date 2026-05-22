@@ -109,8 +109,6 @@ tasks.matching { task ->
     dependsOn(prepareRustLibTask)
     inputs.dir(stagedRustLibDir)
 }
-    }
-}
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
