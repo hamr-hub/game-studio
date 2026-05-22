@@ -74,7 +74,7 @@ def stagedRustLibDir = file("${buildDir}/rust-libs/${targetAbi}")
 def rustLibName = "libcocos_studio.so"
 def nativeLibPath = file("${rustTargetDir}/${rustTarget}/release/${rustLibName}")
 
-def prepareRustLibTask = tasks.register("prepareRustLib") {
+def prepareRustLibTask = tasks.register("prepareRustLib", Exec) {
     group = "build"
     description = "Builds cocos_studio Rust library and stages it into AGP jniLibs directory for packaging."
 
@@ -82,16 +82,16 @@ def prepareRustLibTask = tasks.register("prepareRustLib") {
     inputs.property("targetAbi", targetAbi)
     inputs.property("rustTarget", rustTarget)
 
-    doLast {
+    doFirst {
         if (!supportedRustTargets.containsKey(targetAbi)) {
             throw new GradleException("Unsupported targetAbi '${targetAbi}'. Supported: ${supportedRustTargets.keySet()}")
         }
 
-        project.exec {
-            workingDir nativeCargoDir
-            commandLine "cargo", "build", "--manifest-path", "${nativeCargoDir}/Cargo.toml", "--target", rustTarget, "--release"
-        }
+        commandLine "cargo", "build", "--manifest-path", "${nativeCargoDir}/Cargo.toml", "--target", rustTarget, "--release"
+        workingDir nativeCargoDir
+    }
 
+    doLast {
         if (!nativeLibPath.exists()) {
             throw new GradleException("Rust build finished but ${nativeLibPath} was not generated.")
         }
