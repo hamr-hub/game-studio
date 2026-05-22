@@ -60,6 +60,53 @@ android {
     }
 }
 
+def targetAbi = (project.findProperty("targetAbi") ?: "arm64-v8a").toString()
+def supportedRustTargets = [
+    "arm64-v8a": "aarch64-linux-android",
+    "x86_64": "x86_64-linux-android",
+    "armeabi-v7a": "armv7-linux-androideabi",
+    "x86": "i686-linux-android",
+]
+def rustTarget = supportedRustTargets.getOrDefault(targetAbi, "aarch64-linux-android")
+def nativeCargoDir = file("${projectDir}/../native")
+def rustTargetDir = file("${nativeCargoDir}/target")
+def stagedRustLibDir = file("${buildDir}/rust-libs/${targetAbi}")
+def rustLibName = "libcocos_studio.so"
+def nativeLibPath = file("${rustTargetDir}/${rustTarget}/release/${rustLibName}")
+
+tasks.register("prepareRustLib") {
+    group = "build"
+    description = "Builds cocos_studio Rust library and stages it into AGP jniLibs directory for packaging."
+
+    outputs.dir(stagedRustLibDir)
+
+    doLast {
+        if (!supportedRustTargets.containsKey(targetAbi)) {
+            throw new GradleException("Unsupported targetAbi '${targetAbi}'. Supported: ${supportedRustTargets.keySet()}")
+        }
+
+        exec {
+            workingDir nativeCargoDir
+            commandLine "cargo", "build", "--manifest-path", "${nativeCargoDir}/Cargo.toml", "--target", rustTarget, "--release"
+        }
+
+        if (!nativeLibPath.exists()) {
+            throw new GradleException("Rust build finished but ${nativeLibPath} was not generated.")
+        }
+
+        copy {
+            from(nativeLibPath)
+            into(stagedRustLibDir)
+        }
+    }
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name.startsWith("merge") && task.name.endsWith("NativeLibs")) {
+        task.dependsOn(tasks.named("prepareRustLib"))
+    }
+}
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.13.1'
