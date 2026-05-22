@@ -561,12 +561,12 @@ fn read_text_from_zip_bytes(data: &[u8], entry: &str) -> Option<String> {
 
     let lowered_entry = normalized_entry.to_lowercase();
     let mut candidates = Vec::new();
-    candidates.push(normalized_entry);
+    candidates.push(normalized_entry.clone());
     let trimmed_entry = normalized_entry.trim_start_matches('/').to_string();
     if !trimmed_entry.is_empty() {
         candidates.push(trimmed_entry);
     }
-    if lowered_entry != candidates[0] {
+    if lowered_entry != normalized_entry {
         candidates.push(lowered_entry);
     }
 
@@ -602,15 +602,13 @@ fn read_asset_file_bytes(asset_path: &str) -> Option<Vec<u8>> {
     let manager = ASSET_MANAGER.lock().unwrap();
     let manager = manager.as_ref()?;
 
-    let cleaned = asset_path.trim_start_matches('/');
-    let cleaned = match CString::new(cleaned) {
+    let cleaned_str = asset_path.trim_start_matches('/');
+    let cleaned = match CString::new(cleaned_str) {
         Ok(path) => path,
         Err(_) => {
             add_to_log(
                 Level::Warn,
-                &format!(
-                    "Failed to build C string for asset '{cleaned}' from AssetManager",
-                ),
+                &format!("Failed to build C string for asset '{cleaned_str}' from AssetManager",),
             );
             return None;
         }
@@ -620,7 +618,7 @@ fn read_asset_file_bytes(asset_path: &str) -> Option<Vec<u8>> {
         None => {
             add_to_log(
                 Level::Warn,
-                &format!("Failed to open asset '{cleaned}' from AssetManager"),
+                &format!("Failed to open asset '{cleaned_str}' from AssetManager"),
             );
             return None;
         }
@@ -630,13 +628,13 @@ fn read_asset_file_bytes(asset_path: &str) -> Option<Vec<u8>> {
     if asset.read_to_end(&mut bytes).is_err() {
         add_to_log(
             Level::Warn,
-            &format!("Failed to read asset '{cleaned}' from AssetManager."),
+            &format!("Failed to read asset '{cleaned_str}' from AssetManager."),
         );
         return None;
     }
 
     if bytes.is_empty() {
-        add_to_log(Level::Warn, &format!("Asset '{cleaned}' resolved to empty bytes."));
+        add_to_log(Level::Warn, &format!("Asset '{cleaned_str}' resolved to empty bytes."));
         return None;
     }
 
