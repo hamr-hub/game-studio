@@ -160,7 +160,8 @@ object GameCatalog {
         distribution: GameDistributionConfig,
     ): GameEntry? {
         val metadata = distribution.findFor(entry)
-        val visible = metadata?.visible ?: distribution.defaultVisible
+        val visible = (metadata?.visible ?: distribution.defaultVisible) &&
+            (distribution.tailNumberRule?.allows(entry.id) ?: true)
         if (!visible) {
             return null
         }

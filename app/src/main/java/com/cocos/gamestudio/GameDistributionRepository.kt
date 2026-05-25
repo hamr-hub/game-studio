@@ -12,6 +12,7 @@ import kotlin.math.max
 data class GameDistributionConfig(
     val defaultVisible: Boolean = true,
     val hasDefaultVisible: Boolean = false,
+    val tailNumberRule: GameTailNumberRule? = null,
     val entries: List<GameDistributionEntry> = emptyList(),
 ) {
     fun findFor(game: GameEntry): GameDistributionEntry? {
@@ -39,6 +40,11 @@ data class GameDistributionConfig(
         return GameDistributionConfig(
             defaultVisible = if (overrides.hasDefaultVisible) overrides.defaultVisible else defaultVisible,
             hasDefaultVisible = hasDefaultVisible || overrides.hasDefaultVisible,
+            tailNumberRule = when {
+                tailNumberRule != null && overrides.tailNumberRule != null -> tailNumberRule.merge(overrides.tailNumberRule)
+                overrides.tailNumberRule != null -> overrides.tailNumberRule
+                else -> tailNumberRule
+            },
             entries = merged.values.toList(),
         )
     }
@@ -51,6 +57,60 @@ data class GameDistributionConfig(
         return entriesByKey.entries.firstOrNull { (_, entry) ->
             entry.matchKeys.any { it in overrideKeys }
         }?.key ?: override.mergeKey
+    }
+}
+
+data class GameTailNumberRule(
+    val enabled: Boolean? = null,
+    val digits: Int? = null,
+    val min: Int? = null,
+    val max: Int? = null,
+    val allow: Set<Int>? = null,
+    val deny: Set<Int>? = null,
+) {
+    fun merge(override: GameTailNumberRule): GameTailNumberRule {
+        return GameTailNumberRule(
+            enabled = override.enabled ?: enabled,
+            digits = override.digits ?: digits,
+            min = override.min ?: min,
+            max = override.max ?: max,
+            allow = override.allow ?: allow,
+            deny = override.deny ?: deny,
+        )
+    }
+
+    fun allows(gameId: String): Boolean {
+        if (enabled != true) {
+            return true
+        }
+
+        val tailNumber = extractTailNumber(gameId) ?: return false
+        if (deny?.contains(tailNumber) == true) {
+            return false
+        }
+        if (!allow.isNullOrEmpty() && tailNumber !in allow) {
+            return false
+        }
+        if (min != null && tailNumber < min) {
+            return false
+        }
+        if (max != null && tailNumber > max) {
+            return false
+        }
+        return true
+    }
+
+    private fun extractTailNumber(gameId: String): Int? {
+        val digitsOnly = gameId.filter { it.isDigit() }
+        if (digitsOnly.isEmpty()) {
+            return null
+        }
+        val length = (digits ?: DEFAULT_DIGITS).coerceAtLeast(1).coerceAtMost(digitsOnly.length)
+        return digitsOnly.takeLast(length).toIntOrNull()
+    }
+
+    companion object {
+        private const val DEFAULT_DIGITS = 2
     }
 }
 
@@ -206,6 +266,7 @@ object GameDistributionRepository {
             GameDistributionConfig(
                 defaultVisible = defaultVisible,
                 hasDefaultVisible = hasDefaultVisible,
+                tailNumberRule = parseTailNumberRule(root),
                 entries = parseEntries(root.opt("games")),
             )
         } catch (e: Exception) {
@@ -232,6 +293,81 @@ object GameDistributionRepository {
             }
             else -> emptyList()
         }
+    }
+
+    private fun parseTailNumberRule(root: JSONObject): GameTailNumberRule? {
+        val rawRule = firstValue(root, "tailNumber", "tail_number", "tailnumber")
+        val topLevelRule = parseTailNumberRuleObject(root, defaultEnabled = null)
+        return when (rawRule) {
+            is JSONObject -> parseTailNumberRuleObject(rawRule, defaultEnabled = true)?.merge(topLevelRule ?: GameTailNumberRule())
+            is Boolean -> GameTailNumberRule(enabled = rawRule).merge(topLevelRule ?: GameTailNumberRule())
+            is String -> parseBoolean(rawRule)?.let { GameTailNumberRule(enabled = it).merge(topLevelRule ?: GameTailNumberRule()) }
+            else -> topLevelRule
+        }
+    }
+
+    private fun parseTailNumberRuleObject(
+        item: JSONObject,
+        defaultEnabled: Boolean?,
+    ): GameTailNumberRule? {
+        val hasAnyField = hasAny(
+            item,
+            "enabled",
+            "switch",
+            "on",
+            "digits",
+            "length",
+            "min",
+            "from",
+            "start",
+            "max",
+            "to",
+            "end",
+            "allow",
+            "allowList",
+            "allow_list",
+            "include",
+            "includes",
+            "deny",
+            "denyList",
+            "deny_list",
+            "exclude",
+            "excludes",
+            "tailNumberEnabled",
+            "tail_number_enabled",
+            "tailnumber_enabled",
+            "tailNumberDigits",
+            "tail_number_digits",
+            "tailnumber_digits",
+            "tailNumberMin",
+            "tail_number_min",
+            "tailnumber_min",
+            "tailNumberMax",
+            "tail_number_max",
+            "tailnumber_max",
+        )
+        if (!hasAnyField && defaultEnabled == null) {
+            return null
+        }
+
+        val configuredEnabled = optBooleanAny(
+            item,
+            "enabled",
+            "switch",
+            "on",
+            "tailNumberEnabled",
+            "tail_number_enabled",
+            "tailnumber_enabled",
+        )
+
+        return GameTailNumberRule(
+            enabled = configuredEnabled ?: defaultEnabled ?: if (hasAnyField) true else null,
+            digits = optIntAny(item, "digits", "length", "tailNumberDigits", "tail_number_digits", "tailnumber_digits"),
+            min = optIntAny(item, "min", "from", "start", "tailNumberMin", "tail_number_min", "tailnumber_min"),
+            max = optIntAny(item, "max", "to", "end", "tailNumberMax", "tail_number_max", "tailnumber_max"),
+            allow = optIntSetAny(item, "allow", "allowList", "allow_list", "include", "includes", "tailNumbers", "tail_numbers"),
+            deny = optIntSetAny(item, "deny", "denyList", "deny_list", "exclude", "excludes"),
+        )
     }
 
     private fun parseEntry(
@@ -279,6 +415,68 @@ object GameDistributionRepository {
     private fun optInt(item: JSONObject, key: String): Int? {
         if (!item.has(key) || item.isNull(key)) return null
         return max(0, item.optInt(key))
+    }
+
+    private fun firstValue(item: JSONObject, vararg keys: String): Any? {
+        return keys.firstNotNullOfOrNull { key ->
+            if (item.has(key) && !item.isNull(key)) item.opt(key) else null
+        }
+    }
+
+    private fun hasAny(item: JSONObject, vararg keys: String): Boolean {
+        return keys.any { key -> item.has(key) && !item.isNull(key) }
+    }
+
+    private fun optBooleanAny(item: JSONObject, vararg keys: String): Boolean? {
+        return keys.firstNotNullOfOrNull { key ->
+            if (!item.has(key) || item.isNull(key)) {
+                null
+            } else {
+                when (val value = item.opt(key)) {
+                    is Boolean -> value
+                    is String -> parseBoolean(value)
+                    else -> item.optBoolean(key)
+                }
+            }
+        }
+    }
+
+    private fun optIntAny(item: JSONObject, vararg keys: String): Int? {
+        return keys.firstNotNullOfOrNull { key -> optInt(item, key) }
+    }
+
+    private fun optIntSetAny(item: JSONObject, vararg keys: String): Set<Int>? {
+        return keys.firstNotNullOfOrNull { key ->
+            if (item.has(key) && !item.isNull(key)) parseIntSet(item.opt(key)) else null
+        }
+    }
+
+    private fun parseIntSet(value: Any?): Set<Int> {
+        return when (value) {
+            is JSONArray -> (0 until value.length()).mapNotNull { index ->
+                parseInt(value.opt(index))
+            }.toSet()
+            is String -> value.split(",", " ", "|")
+                .mapNotNull { token -> parseInt(token) }
+                .toSet()
+            else -> parseInt(value)?.let { setOf(it) } ?: emptySet()
+        }
+    }
+
+    private fun parseInt(value: Any?): Int? {
+        return when (value) {
+            is Number -> max(0, value.toInt())
+            is String -> value.trim().toIntOrNull()?.let { max(0, it) }
+            else -> null
+        }
+    }
+
+    private fun parseBoolean(value: String): Boolean? {
+        return when (value.trim().lowercase()) {
+            "true", "1", "on", "yes" -> true
+            "false", "0", "off", "no" -> false
+            else -> null
+        }
     }
 }
 
