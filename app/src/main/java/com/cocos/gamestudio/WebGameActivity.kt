@@ -383,6 +383,36 @@ class WebGameActivity : AppCompatActivity() {
               window.screencanvas = window.screencanvas || canvas;
               window.__webSandboxLoaded = {};
 
+              if (window.EventTarget && window.Event && !EventTarget.prototype.__webSandboxDispatchPatched) {
+                var nativeDispatchEvent = EventTarget.prototype.dispatchEvent;
+                EventTarget.prototype.__webSandboxDispatchPatched = true;
+                EventTarget.prototype.dispatchEvent = function (event) {
+                  if (!(event instanceof Event)) {
+                    var original = event || {};
+                    var type = original.type || original.name || 'message';
+                    var domEvent;
+                    try {
+                      domEvent = new CustomEvent(type, { bubbles: true, cancelable: true, detail: original });
+                    } catch (e) {
+                      domEvent = document.createEvent('Event');
+                      domEvent.initEvent(type, true, true);
+                      domEvent.detail = original;
+                    }
+                    if (typeof original === 'object') {
+                      Object.keys(original).forEach(function (key) {
+                        if (!(key in domEvent)) {
+                          try {
+                            Object.defineProperty(domEvent, key, { value: original[key], configurable: true });
+                          } catch (e) {}
+                        }
+                      });
+                    }
+                    event = domEvent;
+                  }
+                  return nativeDispatchEvent.call(this, event);
+                };
+              }
+
               function noop() {}
               function asyncOk(value) {
                 return {
