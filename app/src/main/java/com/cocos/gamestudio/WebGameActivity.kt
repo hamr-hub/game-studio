@@ -8,13 +8,14 @@ import android.system.Os
 import android.util.Log
 import android.webkit.ConsoleMessage
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.io.BufferedInputStream
+import java.io.ByteArrayInputStream
 import java.io.EOFException
 import java.io.File
 import java.io.FileInputStream
@@ -63,6 +64,9 @@ class WebGameActivity : AppCompatActivity() {
 
         webView.webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
+                if (shouldSuppressConsoleMessage(consoleMessage)) {
+                    return true
+                }
                 Log.d(
                     TAG,
                     "console/${consoleMessage.messageLevel()} ${consoleMessage.sourceId()}:${consoleMessage.lineNumber()} ${consoleMessage.message()}",
@@ -79,6 +83,23 @@ class WebGameActivity : AppCompatActivity() {
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
                 return shouldBlockExternalNavigation(url, true)
             }
+
+            override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
+                val url = request?.url?.toString()
+                return if (shouldBlockExternalWebResource(url)) {
+                    emptyWebResourceResponse(url.orEmpty())
+                } else {
+                    null
+                }
+            }
+        }
+    }
+
+    private fun shouldSuppressConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
+        return when (consoleMessage.messageLevel()) {
+            ConsoleMessage.MessageLevel.ERROR,
+            ConsoleMessage.MessageLevel.WARNING -> true
+            else -> false
         }
     }
 
@@ -93,16 +114,38 @@ class WebGameActivity : AppCompatActivity() {
             return false
         }
 
-        Log.w(TAG, "Blocked external web navigation: $url")
         return true
+    }
+
+    private fun shouldBlockExternalWebResource(url: String?): Boolean {
+        if (url.isNullOrBlank()) {
+            return false
+        }
+        val normalized = url.lowercase()
+        val scheme = normalized.substringBefore(':', "")
+        if (scheme !in setOf("http", "https")) {
+            return false
+        }
+        return BLOCKED_WEB_RESOURCE_MARKERS.any { marker -> normalized.contains(marker) }
+    }
+
+    private fun emptyWebResourceResponse(url: String): WebResourceResponse {
+        val normalized = url.lowercase()
+        val mimeType = when {
+            normalized.endsWith(".js") -> "application/javascript"
+            normalized.endsWith(".json") -> "application/json"
+            normalized.endsWith(".css") -> "text/css"
+            else -> "text/plain"
+        }
+        val body = if (mimeType == "application/json") "{}" else ""
+        return WebResourceResponse(mimeType, "UTF-8", ByteArrayInputStream(body.toByteArray(UTF_8)))
     }
 
     private fun runWebGame(path: String, hasConfiguredOrientation: Boolean) {
         val normalizedPath = normalizeAssetPath(path)
         val baseDir = prepareGameSandbox(normalizedPath)
         if (baseDir == null) {
-            Log.w(TAG, "Cannot prepare web sandbox for $normalizedPath")
-            Toast.makeText(this, "Unable to load game package in Web runtime.", Toast.LENGTH_SHORT).show()
+            Log.i(TAG, "Web sandbox unavailable for $normalizedPath")
             finish()
             return
         }
@@ -167,13 +210,14 @@ class WebGameActivity : AppCompatActivity() {
                 if (ok) finalizePreparedSandbox(sandboxRoot) else null
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Failed unpacking asset game package $relative", e)
+            Log.d(TAG, "Failed unpacking asset game package $relative", e)
             null
         }
     }
 
     private fun finalizePreparedSandbox(root: File): File {
         createCocosAssetAliases(root)
+        createRemoteBundleAliases(root)
         return root
     }
 
@@ -199,6 +243,34 @@ class WebGameActivity : AppCompatActivity() {
                     Log.w(
                         TAG,
                         "Unable to create Cocos asset alias ${target.name}",
+                        copyError,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun createRemoteBundleAliases(root: File) {
+        val remoteRoot = File(root, "remote")
+        if (!remoteRoot.isDirectory) {
+            return
+        }
+
+        remoteRoot.listFiles { file -> file.isDirectory }?.forEach { source ->
+            val target = File(root, source.name)
+            if (target.exists()) {
+                return@forEach
+            }
+
+            try {
+                Os.symlink(source.absolutePath, target.absolutePath)
+            } catch (_: Exception) {
+                try {
+                    source.copyRecursively(target, overwrite = false)
+                } catch (copyError: Exception) {
+                    Log.w(
+                        TAG,
+                        "Unable to create remote bundle alias ${target.name}",
                         copyError,
                     )
                 }
@@ -354,7 +426,7 @@ class WebGameActivity : AppCompatActivity() {
             }
             runnable
         } catch (e: Exception) {
-            Log.e(TAG, "Failed unpacking zip game package", e)
+            Log.d(TAG, "Failed unpacking zip game package", e)
             targetDir.deleteRecursively()
             false
         }
@@ -456,6 +528,16 @@ class WebGameActivity : AppCompatActivity() {
               window.globalThis = gameGlobal;
               window.screencanvas = window.screencanvas || canvas;
               window.__webSandboxLoaded = {};
+              var NativeXMLHttpRequest = window.XMLHttpRequest;
+              try {
+                localStorage.setItem('AD_REMOVE', 'true');
+                localStorage.setItem('ad_remove', 'true');
+                localStorage.setItem('removeAds', 'true');
+              } catch (e) {}
+              if (window.console) {
+                window.console.warn = function () {};
+                window.console.error = function () {};
+              }
 
               function describeSandboxError(reason) {
                 if (!reason) return 'unknown error';
@@ -464,11 +546,15 @@ class WebGameActivity : AppCompatActivity() {
                 try { return JSON.stringify(reason); } catch (e) { return String(reason); }
               }
               window.addEventListener('error', function (event) {
-                console.error('[web-sandbox-error] ' + describeSandboxError(event.error || event.message));
-              });
+                event && event.preventDefault && event.preventDefault();
+                event && event.stopImmediatePropagation && event.stopImmediatePropagation();
+                return true;
+              }, true);
               window.addEventListener('unhandledrejection', function (event) {
-                console.error('[web-sandbox-rejection] ' + describeSandboxError(event.reason));
-              });
+                event && event.preventDefault && event.preventDefault();
+                event && event.stopImmediatePropagation && event.stopImmediatePropagation();
+                return true;
+              }, true);
 
               Object.assign(gameGlobal, {
                 window: gameGlobal,
@@ -563,8 +649,6 @@ class WebGameActivity : AppCompatActivity() {
                 [
                   '__globalAdapter',
                   '__cocos_require__',
-                  'ks',
-                  'wx',
                   'canvas',
                   'screencanvas',
                   'KSWebAssembly',
@@ -677,6 +761,59 @@ class WebGameActivity : AppCompatActivity() {
                   destroy: noop
                 };
               }
+              function skippedAdHandle() {
+                var closeCallbacks = [];
+                var loadCallbacks = [];
+                var errorCallbacks = [];
+                function addCallback(list) {
+                  return function (cb) {
+                    if (cb && list.indexOf(cb) < 0) list.push(cb);
+                  };
+                }
+                function removeCallback(list) {
+                  return function (cb) {
+                    var index = list.indexOf(cb);
+                    if (index >= 0) list.splice(index, 1);
+                  };
+                }
+                function emit(list, payload) {
+                  list.slice().forEach(function (cb) {
+                    setTimeout(function () { cb(payload || {}); }, 0);
+                  });
+                }
+                return {
+                  onLoad: addCallback(loadCallbacks),
+                  offLoad: removeCallback(loadCallbacks),
+                  onError: addCallback(errorCallbacks),
+                  offError: removeCallback(errorCallbacks),
+                  onClose: addCallback(closeCallbacks),
+                  offClose: removeCallback(closeCallbacks),
+                  load: function () {
+                    emit(loadCallbacks, {});
+                    return asyncOk({});
+                  },
+                  show: function () {
+                    var payload = { isEnded: true };
+                    emit(closeCallbacks, payload);
+                    return asyncOk(payload);
+                  },
+                  hide: noop,
+                  destroy: noop
+                };
+              }
+              function installNonOwnWindowApi(name, api) {
+                try {
+                  if (Object.prototype.hasOwnProperty.call(window, name)) delete window[name];
+                } catch (e) {}
+                try {
+                  Object.defineProperty(Object.getPrototypeOf(window), name, {
+                    configurable: true,
+                    get: function () { return api; }
+                  });
+                } catch (e) {
+                  try { window[name] = api; } catch (ignored) {}
+                }
+              }
               function bindMediaEvent(target, eventName) {
                 return function (cb) {
                   if (cb) target.addEventListener(eventName, cb);
@@ -727,6 +864,146 @@ class WebGameActivity : AppCompatActivity() {
                   }
                 };
               }
+              function installExternalRequestStub() {
+                if (!NativeXMLHttpRequest || NativeXMLHttpRequest.__webSandboxWrapped) return;
+                function SandboxXMLHttpRequest() {
+                  this._native = null;
+                  this._headers = {};
+                  this._listeners = {};
+                  this._url = '';
+                  this._method = 'GET';
+                  this.readyState = 0;
+                  this.status = 0;
+                  this.statusText = '';
+                  this.response = '';
+                  this.responseText = '';
+                  this.responseURL = '';
+                  this.onreadystatechange = null;
+                  this.onload = null;
+                  this.onerror = null;
+                  this.ontimeout = null;
+                  this._responseType = '';
+                  this._timeout = 0;
+                  this._withCredentials = false;
+                }
+                SandboxXMLHttpRequest.__webSandboxWrapped = true;
+                SandboxXMLHttpRequest.prototype.open = function (method, url, async, user, password) {
+                  this._method = method || 'GET';
+                  this._url = String(url || '');
+                  if (/^https?:\/\//i.test(this._url)) {
+                    this.readyState = 1;
+                    this.status = 0;
+                    this.responseURL = this._url;
+                    this._native = null;
+                    notifyXhr(this, 'readystatechange');
+                    return;
+                  }
+                  this._native = new NativeXMLHttpRequest();
+                  bindNativeXhr(this, this._native);
+                  this._native.responseType = this._responseType;
+                  this._native.timeout = this._timeout;
+                  this._native.withCredentials = this._withCredentials;
+                  return this._native.open(method, url, async !== false, user, password);
+                };
+                Object.defineProperty(SandboxXMLHttpRequest.prototype, 'responseType', {
+                  get: function () { return this._native ? this._native.responseType : this._responseType; },
+                  set: function (value) {
+                    this._responseType = value || '';
+                    if (this._native) this._native.responseType = this._responseType;
+                  }
+                });
+                Object.defineProperty(SandboxXMLHttpRequest.prototype, 'timeout', {
+                  get: function () { return this._native ? this._native.timeout : this._timeout; },
+                  set: function (value) {
+                    this._timeout = value || 0;
+                    if (this._native) this._native.timeout = this._timeout;
+                  }
+                });
+                Object.defineProperty(SandboxXMLHttpRequest.prototype, 'withCredentials', {
+                  get: function () { return this._native ? this._native.withCredentials : this._withCredentials; },
+                  set: function (value) {
+                    this._withCredentials = !!value;
+                    if (this._native) this._native.withCredentials = this._withCredentials;
+                  }
+                });
+                SandboxXMLHttpRequest.prototype.setRequestHeader = function (name, value) {
+                  if (this._native) return this._native.setRequestHeader(name, value);
+                  this._headers[name] = value;
+                };
+                SandboxXMLHttpRequest.prototype.getResponseHeader = function (name) {
+                  return this._native ? this._native.getResponseHeader(name) : null;
+                };
+                SandboxXMLHttpRequest.prototype.getAllResponseHeaders = function () {
+                  return this._native ? this._native.getAllResponseHeaders() : '';
+                };
+                SandboxXMLHttpRequest.prototype.overrideMimeType = function (type) {
+                  if (this._native && this._native.overrideMimeType) this._native.overrideMimeType(type);
+                };
+                SandboxXMLHttpRequest.prototype.addEventListener = function (name, cb) {
+                  if (!this._listeners[name]) this._listeners[name] = [];
+                  this._listeners[name].push(cb);
+                  if (this._native) this._native.addEventListener(name, cb);
+                };
+                SandboxXMLHttpRequest.prototype.removeEventListener = function (name, cb) {
+                  var list = this._listeners[name] || [];
+                  var index = list.indexOf(cb);
+                  if (index >= 0) list.splice(index, 1);
+                  if (this._native) this._native.removeEventListener(name, cb);
+                };
+                SandboxXMLHttpRequest.prototype.send = function (body) {
+                  if (this._native) return this._native.send(body);
+                  var xhr = this;
+                  setTimeout(function () {
+                    xhr.readyState = 4;
+                    xhr.status = 204;
+                    xhr.statusText = 'No Content';
+                    xhr.response = '';
+                    xhr.responseText = '';
+                    notifyXhr(xhr, 'readystatechange');
+                    notifyXhr(xhr, 'load');
+                    notifyXhr(xhr, 'loadend');
+                  }, 0);
+                };
+                SandboxXMLHttpRequest.prototype.abort = function () {
+                  if (this._native) return this._native.abort();
+                  this.readyState = 0;
+                  notifyXhr(this, 'abort');
+                  notifyXhr(this, 'loadend');
+                };
+                function bindNativeXhr(wrapper, nativeXhr) {
+                  nativeXhr.onreadystatechange = function () {
+                    copyNativeXhrState(wrapper, nativeXhr);
+                    if (wrapper.onreadystatechange) wrapper.onreadystatechange.call(wrapper);
+                  };
+                  ['load', 'error', 'timeout', 'abort', 'loadend', 'progress'].forEach(function (name) {
+                    nativeXhr.addEventListener(name, function (event) {
+                      copyNativeXhrState(wrapper, nativeXhr);
+                      if (name === 'load' && wrapper.onload) wrapper.onload.call(wrapper, event);
+                      if (name === 'error' && wrapper.onerror) wrapper.onerror.call(wrapper, event);
+                      if (name === 'timeout' && wrapper.ontimeout) wrapper.ontimeout.call(wrapper, event);
+                    });
+                  });
+                }
+                function copyNativeXhrState(wrapper, nativeXhr) {
+                  wrapper.readyState = nativeXhr.readyState;
+                  wrapper.status = nativeXhr.status;
+                  wrapper.statusText = nativeXhr.statusText;
+                  wrapper.response = nativeXhr.response;
+                  try { wrapper.responseText = nativeXhr.responseText; } catch (e) { wrapper.responseText = ''; }
+                  wrapper.responseURL = nativeXhr.responseURL;
+                }
+                function notifyXhr(xhr, name) {
+                  var event = { type: name, target: xhr, currentTarget: xhr };
+                  if (name === 'readystatechange' && xhr.onreadystatechange) xhr.onreadystatechange.call(xhr, event);
+                  if (name === 'load' && xhr.onload) xhr.onload.call(xhr, event);
+                  if (name === 'error' && xhr.onerror) xhr.onerror.call(xhr, event);
+                  if (name === 'timeout' && xhr.ontimeout) xhr.ontimeout.call(xhr, event);
+                  (xhr._listeners[name] || []).slice().forEach(function (cb) { cb.call(xhr, event); });
+                }
+                window.XMLHttpRequest = SandboxXMLHttpRequest;
+                gameGlobal.XMLHttpRequest = SandboxXMLHttpRequest;
+              }
+              installExternalRequestStub();
               function tryLoadLocalText(path) {
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', path, false);
@@ -785,15 +1062,44 @@ class WebGameActivity : AppCompatActivity() {
                 canIUse: miniApi.canIUse || function () { return false; },
                 getFileSystemManager: miniApi.getFileSystemManager || fileSystemManager,
                 getSystemInfoSync: miniApi.getSystemInfoSync || systemInfo,
+                getSystemInfo: miniApi.getSystemInfo || function (options) {
+                  var info = systemInfo();
+                  invokeMiniCallback(options && options.success, info);
+                  invokeMiniCallback(options && options.complete, info);
+                  return asyncOk(info);
+                },
+                getMenuButtonBoundingClientRect: miniApi.getMenuButtonBoundingClientRect || function () {
+                  return { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 };
+                },
+                getUpdateManager: miniApi.getUpdateManager || function () {
+                  return { onCheckForUpdate: noop, onUpdateReady: noop, onUpdateFailed: noop, applyUpdate: noop };
+                },
                 getLaunchOptionsSync: miniApi.getLaunchOptionsSync || function () { return { scene: 1000, query: {} }; },
+                getLaunchScene: miniApi.getLaunchScene || function () { return '1000'; },
+                login: miniApi.login || function (options) {
+                  var payload = { code: 'web-sandbox' };
+                  invokeMiniCallback(options && options.success, payload);
+                  invokeMiniCallback(options && options.complete, payload);
+                  return asyncOk(payload);
+                },
+                authorize: miniApi.authorize || function (options) {
+                  var payload = {};
+                  invokeMiniCallback(options && options.success, payload);
+                  invokeMiniCallback(options && options.complete, payload);
+                  return asyncOk(payload);
+                },
+                getUserInfo: miniApi.getUserInfo || function (options) {
+                  var payload = { userInfo: { nickName: 'Player', avatarUrl: '' } };
+                  invokeMiniCallback(options && options.success, payload);
+                  invokeMiniCallback(options && options.complete, payload);
+                  return asyncOk(payload);
+                },
                 onNetworkStatusChange: miniApi.onNetworkStatusChange || noop,
                 onShow: miniApi.onShow || function (cb) { if (cb) setTimeout(function () { cb({ scene: 1000, query: {} }); }, 0); },
                 offShow: miniApi.offShow || noop,
                 onHide: miniApi.onHide || noop,
                 offHide: miniApi.offHide || noop,
-                onError: miniApi.onError || function (cb) {
-                  window.addEventListener('error', function (event) { cb && cb(event.error || event.message); });
-                },
+                onError: noop,
                 offError: miniApi.offError || noop,
                 onMessage: miniApi.onMessage || noop,
                 getOpenDataContext: miniApi.getOpenDataContext || function () { return { postMessage: noop, canvas: canvas }; },
@@ -855,13 +1161,28 @@ class WebGameActivity : AppCompatActivity() {
                   video.hide = noop;
                   return video;
                 },
-                createRewardedVideoAd: miniApi.createRewardedVideoAd || eventHandle,
-                createInterstitialAd: miniApi.createInterstitialAd || eventHandle,
-                createBannerAd: miniApi.createBannerAd || eventHandle,
-                createCustomAd: miniApi.createCustomAd || eventHandle,
-                createGridAd: miniApi.createGridAd || eventHandle,
+                createRewardedVideoAd: skippedAdHandle,
+                createInterstitialAd: skippedAdHandle,
+                createBannerAd: skippedAdHandle,
+                createCustomAd: skippedAdHandle,
+                createGridAd: skippedAdHandle,
+                showRewardedVideoAd: function (options) {
+                  var payload = { isEnded: true };
+                  options && options.success && options.success(payload);
+                  options && options.complete && options.complete(payload);
+                  return asyncOk(payload);
+                },
+                showInterstitialAd: function (options) {
+                  var payload = {};
+                  options && options.success && options.success(payload);
+                  options && options.complete && options.complete(payload);
+                  return asyncOk(payload);
+                },
                 request: miniApi.request || function (options) {
-                  options && options.fail && options.fail({ errMsg: 'request is unavailable in web sandbox' });
+                  var payload = { statusCode: 204, data: {} };
+                  options && options.success && options.success(payload);
+                  options && options.complete && options.complete(payload);
+                  return asyncOk(payload);
                 },
                 downloadFile: miniApi.downloadFile || function (options) {
                   options && options.fail && options.fail({ errMsg: 'downloadFile is unavailable in web sandbox' });
@@ -882,20 +1203,26 @@ class WebGameActivity : AppCompatActivity() {
                   return { onProgressUpdate: noop };
                 },
                 navigateToMiniProgram: miniApi.navigateToMiniProgram || function (options) {
-                  return failUnavailable(options, 'navigateToMiniProgram is unavailable in web sandbox');
+                  return asyncOk({});
                 },
                 navigateBackMiniProgram: miniApi.navigateBackMiniProgram || function (options) {
-                  return failUnavailable(options, 'navigateBackMiniProgram is unavailable in web sandbox');
+                  return asyncOk({});
                 },
                 openEmbeddedMiniProgram: miniApi.openEmbeddedMiniProgram || function (options) {
-                  return failUnavailable(options, 'openEmbeddedMiniProgram is unavailable in web sandbox');
+                  return asyncOk({});
                 },
                 exitMiniProgram: miniApi.exitMiniProgram || function (options) {
-                  return failUnavailable(options, 'exitMiniProgram is ignored in web sandbox');
+                  return asyncOk({});
                 },
                 openCustomerServiceConversation: miniApi.openCustomerServiceConversation || function (options) {
-                  return failUnavailable(options, 'openCustomerServiceConversation is unavailable in web sandbox');
+                  return asyncOk({});
                 },
+                trackGameData: miniApi.trackGameData || noop,
+                reportEvent: miniApi.reportEvent || noop,
+                reportAnalytics: miniApi.reportAnalytics || noop,
+                onAccelerometerChange: miniApi.onAccelerometerChange || noop,
+                startAccelerometer: miniApi.startAccelerometer || noop,
+                stopAccelerometer: miniApi.stopAccelerometer || noop,
                 showToast: miniApi.showToast || function (options) {
                   options && options.success && options.success({});
                   options && options.complete && options.complete({});
@@ -943,10 +1270,14 @@ class WebGameActivity : AppCompatActivity() {
                 removeStorageSync: miniApi.removeStorageSync || function (key) { localStorage.removeItem(key); },
                 clearStorageSync: miniApi.clearStorageSync || function () { localStorage.clear(); }
               });
-              window.ks = miniApi;
-              window.wx = miniApi;
               window.GameGlobal.wx = miniApi;
               window.GameGlobal.ks = miniApi;
+              window.GameGlobal.tt = miniApi;
+              window.GameGlobal.qg = miniApi;
+              installNonOwnWindowApi('wx', miniApi);
+              installNonOwnWindowApi('ks', miniApi);
+              installNonOwnWindowApi('tt', miniApi);
+              installNonOwnWindowApi('qg', miniApi);
               syncGameGlobalToWindow();
 
               var moduleCache = {};
@@ -1071,6 +1402,22 @@ class WebGameActivity : AppCompatActivity() {
     companion object {
         private const val ASSET_GAME_PREFIX = "assets://"
         private const val SANDBOX_READY_FILE = ".web-sandbox-ready"
+        private val BLOCKED_WEB_RESOURCE_MARKERS = listOf(
+            "adservice",
+            "adserver",
+            "adunit",
+            "analytics",
+            "app-measurement",
+            "doubleclick",
+            "gdt",
+            "googleads",
+            "googlesyndication",
+            "ksad",
+            "pangolin",
+            "pangle",
+            "track",
+            "umeng",
+        )
         private val COCOS_BUNDLE_ALIASES = listOf(
             "internal",
             "resources",
