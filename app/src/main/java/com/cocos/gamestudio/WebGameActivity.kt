@@ -419,10 +419,15 @@ class WebGameActivity : AppCompatActivity() {
                 HTMLAudioElement: window.HTMLAudioElement,
                 HTMLVideoElement: window.HTMLVideoElement,
                 WebGLRenderingContext: window.WebGLRenderingContext,
+                WebAssembly: window.WebAssembly,
+                KSWebAssembly: window.WebAssembly,
+                WXWebAssembly: window.WebAssembly,
                 TouchEvent: window.TouchEvent,
                 MouseEvent: window.MouseEvent,
                 DeviceMotionEvent: window.DeviceMotionEvent
               });
+              window.KSWebAssembly = window.KSWebAssembly || window.WebAssembly;
+              window.WXWebAssembly = window.WXWebAssembly || window.WebAssembly;
 
               function syncGameGlobalToWindow() {
                 [
