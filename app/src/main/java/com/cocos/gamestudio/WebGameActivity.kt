@@ -767,6 +767,7 @@ class WebGameActivity : AppCompatActivity() {
                 getSharedCanvas: miniApi.getSharedCanvas || function () { return canvas; },
                 createCanvas: miniApi.createCanvas || function () { return document.createElement('canvas'); },
                 createImage: miniApi.createImage || function () { return new Image(); },
+                loadFont: miniApi.loadFont || function () { return 'Arial'; },
                 createInnerAudioContext: miniApi.createInnerAudioContext || function () {
                   var audio = new Audio();
                   audio.destroy = function () { audio.pause(); audio.src = ''; };
