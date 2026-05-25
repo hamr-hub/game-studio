@@ -32,7 +32,7 @@ class WebGameActivity : AppCompatActivity() {
         webView = WebView(this)
         setContentView(webView)
 
-        gamePath = intent.getStringExtra("GAME_PATH") ?: ""
+        gamePath = normalizeAssetPath(intent.getStringExtra("GAME_PATH") ?: "")
         if (gamePath.isBlank()) {
             finish()
             return
@@ -56,9 +56,10 @@ class WebGameActivity : AppCompatActivity() {
     }
 
     private fun runWebGame(path: String) {
-        val baseDir = prepareGameSandbox(path)
+        val normalizedPath = normalizeAssetPath(path)
+        val baseDir = prepareGameSandbox(normalizedPath)
         if (baseDir == null) {
-            Log.w(TAG, "Cannot prepare web sandbox for $path")
+            Log.w(TAG, "Cannot prepare web sandbox for $normalizedPath")
             Toast.makeText(this, "Unable to load game package in Web runtime.", Toast.LENGTH_SHORT).show()
             finish()
             return
@@ -218,6 +219,19 @@ class WebGameActivity : AppCompatActivity() {
 
     private fun isSupportedZip(path: String): Boolean {
         return path.endsWith(".zip", ignoreCase = true)
+    }
+
+    private fun normalizeAssetPath(path: String): String {
+        val trimmed = path.trim()
+        return when {
+            trimmed.startsWith(ASSET_GAME_PREFIX) -> trimmed
+            trimmed.startsWith("/assets://") -> trimmed.removePrefix("/")
+            trimmed.startsWith("assets:/") && !trimmed.startsWith(ASSET_GAME_PREFIX) ->
+                "assets://${trimmed.removePrefix("assets:/").trimStart('/')}"
+            trimmed.startsWith("/assets:/") ->
+                "assets://${trimmed.removePrefix("/assets:/").trimStart('/')}"
+            else -> trimmed
+        }
     }
 
     companion object {

@@ -27,6 +27,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
+    private val ASSET_GAME_PREFIX = "assets://"
 
     private lateinit var surfaceView: SurfaceView
     private lateinit var statsTv: TextView
@@ -191,7 +192,7 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
         setContentView(root)
         surfaceView.holder.addCallback(this)
 
-        requestedPath = intent.getStringExtra("GAME_PATH") ?: ""
+        requestedPath = normalizeAssetPath(intent.getStringExtra("GAME_PATH") ?: "")
         gamePath = requestedPath
         if (gamePath.isBlank()) {
             Toast.makeText(this, "Game path is empty.", Toast.LENGTH_SHORT).show()
@@ -262,6 +263,19 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
     private fun saveRecentlyPlayed(path: String) {
         val prefs = getSharedPreferences("user_prefs", 0)
         GameCatalog.addToRecent(prefs, path)
+    }
+
+    private fun normalizeAssetPath(path: String): String {
+        val trimmed = path.trim()
+        return when {
+            trimmed.startsWith(ASSET_GAME_PREFIX) -> trimmed
+            trimmed.startsWith("/assets://") -> trimmed.removePrefix("/").trim()
+            trimmed.startsWith("assets:/") && !trimmed.startsWith(ASSET_GAME_PREFIX) ->
+                "assets://${trimmed.removePrefix("assets:/").trimStart('/')}"
+            trimmed.startsWith("/assets:/") ->
+                "assets://${trimmed.removePrefix("/assets:/").trimStart('/')}"
+            else -> trimmed
+        }
     }
 
     private fun shouldFallbackToWebRuntime(bootstrapStatus: String): Boolean {
