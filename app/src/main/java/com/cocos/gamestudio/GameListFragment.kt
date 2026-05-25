@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
@@ -56,9 +57,11 @@ class GameListFragment : Fragment() {
         val dialog = BottomSheetDialog(requireContext())
         val bottomSheetView = layoutInflater.inflate(R.layout.bottom_sheet_game_detail, null)
         
+        val iconIv = bottomSheetView.findViewById<ImageView>(R.id.detail_icon_iv)
         val iconTv = bottomSheetView.findViewById<TextView>(R.id.detail_icon_tv)
         val nameTv = bottomSheetView.findViewById<TextView>(R.id.detail_name_tv)
         val sizeTv = bottomSheetView.findViewById<TextView>(R.id.detail_size_tv)
+        val descTv = bottomSheetView.findViewById<TextView>(R.id.detail_desc_tv)
         val playBtn = bottomSheetView.findViewById<MaterialButton>(R.id.play_button)
 
         iconTv.text = game.iconLabel
@@ -67,8 +70,10 @@ class GameListFragment : Fragment() {
             setColor(game.iconColor)
         }
         iconTv.background = bg
+        GameIconLoader.bind(iconIv, iconTv, game)
         nameTv.text = game.displayName
         sizeTv.text = formatSize(game.sizeBytes)
+        descTv.text = game.description
 
         playBtn.setOnClickListener {
             dialog.dismiss()

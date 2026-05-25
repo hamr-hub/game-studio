@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -55,6 +56,7 @@ class GameListActivity : AppCompatActivity() {
 
         class MyViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
             val textView: TextView = view.findViewById(R.id.game_name_tv)
+            val iconImageView: ImageView = view.findViewById(R.id.game_icon_iv)
             val iconView: TextView = view.findViewById(R.id.game_icon_tv)
             val sizeView: TextView = view.findViewById(R.id.game_size_tv)
         }
@@ -66,10 +68,15 @@ class GameListActivity : AppCompatActivity() {
         }
 
         fun filter(query: String) {
-            filteredGames = if (query.isEmpty()) {
+            val normalizedQuery = query.trim()
+            filteredGames = if (normalizedQuery.isEmpty()) {
                 allGames
             } else {
-                allGames.filter { it.displayName.contains(query, ignoreCase = true) }
+                allGames.filter {
+                    it.displayName.contains(normalizedQuery, ignoreCase = true) ||
+                        it.id.contains(normalizedQuery, ignoreCase = true) ||
+                        it.assetName.contains(normalizedQuery, ignoreCase = true)
+                }
             }
             notifyDataSetChanged()
         }
@@ -89,6 +96,7 @@ class GameListActivity : AppCompatActivity() {
             }
             holder.iconView.background = bg
             holder.iconView.text = game.iconLabel
+            GameIconLoader.bind(holder.iconImageView, holder.iconView, game)
             holder.sizeView.text = formatSize(game.sizeBytes)
             holder.view.setOnClickListener { onClick(game) }
         }

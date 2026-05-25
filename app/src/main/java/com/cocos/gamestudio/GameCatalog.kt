@@ -6,16 +6,23 @@ import java.io.File
 import java.io.IOException
 
 data class GameEntry(
+    val id: String,
+    val assetName: String,
     val file: File,
     val displayName: String,
+    val description: String,
     val iconLabel: String,
     val iconColor: Int,
+    val iconUri: String?,
     val sizeBytes: Long,
+    val displayOrder: Int,
 )
 
 object GameCatalog {
     private const val TAG = "GameCatalog"
+    private const val CATALOG_CACHE_TTL_MS = 60 * 1000L
     private var cachedGames: List<GameEntry>? = null
+    private var cachedAtMs: Long = 0L
 
     private val iconColors = intArrayOf(
         0xFF4DB6AC.toInt(),
@@ -31,17 +38,26 @@ object GameCatalog {
     private const val ASSET_GAMES_DIR = "games"
 
     suspend fun listGames(context: Context, forceRefresh: Boolean = false): List<GameEntry> = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-        if (!forceRefresh && cachedGames != null) {
+        val now = System.currentTimeMillis()
+        if (!forceRefresh && cachedGames != null && now - cachedAtMs < CATALOG_CACHE_TTL_MS) {
             return@withContext cachedGames!!
         }
 
+        val distribution = GameDistributionRepository.load(context, forceRefresh)
         val entryMap = linkedMapOf<String, GameEntry>()
 
-        listFromFileSystem(File("/sdcard/game-demo")).forEach { addByName(entryMap, it) }
-        listFromAssets(context).forEach { addByName(entryMap, it) }
+        listFromFileSystem(File("/sdcard/game-demo")).forEach { addByIdentity(entryMap, it) }
+        listFromAssets(context).forEach { addByIdentity(entryMap, it) }
 
-        val result = entryMap.values.sortedBy { it.displayName.lowercase() }
+        val result = entryMap.values
+            .mapNotNull { applyDistribution(it, distribution) }
+            .sortedWith(
+                compareBy<GameEntry> { it.displayOrder }
+                    .thenBy { it.displayName.lowercase() }
+                    .thenBy { it.assetName.lowercase() },
+        )
         cachedGames = result
+        cachedAtMs = now
         result
     }
 
@@ -52,7 +68,7 @@ object GameCatalog {
         return serialized
             .split(",")
             .mapNotNull { raw -> available[raw] }
-            .filter { it.file.exists() }
+            .filter { isLaunchable(it) }
     }
 
     fun addToRecent(context: android.content.SharedPreferences, path: String) {
@@ -64,11 +80,15 @@ object GameCatalog {
         context.edit().putString("recent_games", limited.joinToString(",")).apply()
     }
 
-    private fun addByName(map: LinkedHashMap<String, GameEntry>, entry: GameEntry) {
-        val key = entry.file.name.lowercase()
+    private fun addByIdentity(map: LinkedHashMap<String, GameEntry>, entry: GameEntry) {
+        val key = entry.id.lowercase()
         if (!map.containsKey(key)) {
             map[key] = entry
         }
+    }
+
+    private fun isLaunchable(entry: GameEntry): Boolean {
+        return entry.file.path.startsWith("assets://") || entry.file.exists()
     }
 
     private fun listFromFileSystem(dir: File): List<GameEntry> {
@@ -112,6 +132,7 @@ object GameCatalog {
             file.length()
         }
         val raw = name.substringBeforeLast(".zip", name)
+        val gameId = raw.substringBefore("_").ifBlank { raw }
         val displayName = raw
             .substringAfterLast("/")
             .replace("_", " ")
@@ -120,6 +141,50 @@ object GameCatalog {
             .ifBlank { "Mini Game" }
         val color = iconColors[(raw.hashCode() and Int.MAX_VALUE) % iconColors.size]
         val iconLabel = displayName.firstOrNull()?.uppercaseChar()?.toString() ?: "G"
-        return GameEntry(file, displayName, iconLabel, color, size)
+        return GameEntry(
+            id = gameId,
+            assetName = name,
+            file = file,
+            displayName = displayName,
+            description = "This game package is ready to launch.",
+            iconLabel = iconLabel,
+            iconColor = color,
+            iconUri = null,
+            sizeBytes = size,
+            displayOrder = Int.MAX_VALUE,
+        )
+    }
+
+    private fun applyDistribution(
+        entry: GameEntry,
+        distribution: GameDistributionConfig,
+    ): GameEntry? {
+        val metadata = distribution.findFor(entry)
+        val visible = metadata?.visible ?: distribution.defaultVisible
+        if (!visible) {
+            return null
+        }
+
+        val iconColor = metadata?.iconColor?.let { parseColorOrNull(it) } ?: entry.iconColor
+        val configuredLabel = metadata?.iconLabel?.trim()?.takeIf { it.isNotEmpty() }
+        val displayName = metadata?.displayName?.trim()?.takeIf { it.isNotEmpty() } ?: entry.displayName
+        val fallbackLabel = displayName.firstOrNull()?.uppercaseChar()?.toString() ?: entry.iconLabel
+        val iconLabel = (configuredLabel ?: fallbackLabel).take(3)
+        return entry.copy(
+            displayName = displayName,
+            description = metadata?.description?.trim()?.takeIf { it.isNotEmpty() } ?: entry.description,
+            iconLabel = iconLabel,
+            iconColor = iconColor,
+            iconUri = metadata?.iconUri?.trim()?.takeIf { it.isNotEmpty() } ?: entry.iconUri,
+            displayOrder = metadata?.order ?: entry.displayOrder,
+        )
+    }
+
+    private fun parseColorOrNull(value: String): Int? {
+        return try {
+            android.graphics.Color.parseColor(value)
+        } catch (_: Exception) {
+            null
+        }
     }
 }

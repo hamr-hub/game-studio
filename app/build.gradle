@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+def gameDistributionConfigUrl = (project.findProperty("gameDistributionConfigUrl") ?: "").toString()
+
 android {
     namespace "com.cocos.gamestudio"
     compileSdk 35
@@ -11,6 +13,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders = [gameDistributionConfigUrl: gameDistributionConfigUrl]
         def targetAbi = project.findProperty("targetAbi")?.toString()
         if (targetAbi) {
             ndk {

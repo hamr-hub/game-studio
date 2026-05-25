@@ -6,4 +6,5 @@
     <string name="recent_games">Recently Played</string>
     <string name="minutes_played">%1$d Minutes Played</string>
     <string name="games_count">%1$d Games</string>
+    <string name="game_distribution_config_url"></string>
 </resources>

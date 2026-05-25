@@ -14,15 +14,28 @@
         android:padding="12dp"
         android:gravity="center">
 
-        <TextView
-            android:id="@+id/game_icon_tv"
+        <FrameLayout
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:gravity="center"
-            android:textColor="#FFFFFFFF"
-            android:textStyle="bold"
-            android:textSize="28sp"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp">
+
+            <ImageView
+                android:id="@+id/game_icon_iv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@null"
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/game_icon_tv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textColor="#FFFFFFFF"
+                android:textStyle="bold"
+                android:textSize="28sp" />
+        </FrameLayout>
 
         <TextView
             android:id="@+id/game_name_tv"

@@ -13,6 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
+        <meta-data
+            android:name="com.cocos.gamestudio.GAME_DISTRIBUTION_URL"
+            android:value="${gameDistributionConfigUrl}" />
+
         <activity
             android:name=".GameListActivity"
             android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"

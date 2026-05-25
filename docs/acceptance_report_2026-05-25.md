@@ -1,12 +1,12 @@
 # 验收检测报告（填报）
 
-- 报告时间：2026-05-25 13:07:16 +0800
+- 报告时间：2026-05-25 16:52:30 +0800
 - 验收人：Game Studio 开发协作流程
 - 设备：Google/OnePlus（`R5CR70SRPSD`）
-- CI run-id：待本轮 web sandbox 修复推送后回填
+- CI run-id：待本轮游戏分发策略推送后回填
 - build 类型：待本轮 debug 真机安装；release 待 CI 验证
 - ABI：arm64-v8a
-- 版本/分支：`main`（本轮修复提交待回填）
+- 版本/分支：`main`（本轮游戏分发策略提交待回填）
 
 ## 1. 测试环境
 - 机器/系统：Android + GitHub Actions artifact + 本地 adb
@@ -24,6 +24,7 @@
 | 控制台过滤器 | 未完成 | 未在本次回归专门验证。
 | 设置页生效 | 未完成 | 未在本次回归专门验证。
 | 截图与相册 | 未完成 | 未在本次回归专门验证。
+| 游戏列表分发策略 | 待回归 | 新增内置 `game_distribution.json` 与可选远端覆盖。目标验证：可见性屏蔽、服务端排序、展示名称、详情说明、文字/图片图标均生效。
 | CI-only 打包安装 | 待回归 | 本轮仍只允许通过 GitHub Actions 打包和 `scripts/fetch_ci_debug_apk.sh` 下载安装，不执行本地 `assemble*`。
 | 真机功能链路 | 待回归 | 待本轮 CI debug APK 安装后重新启动列表页、详情页和游戏页。
 | 内建游戏 `assets://games/*.zip` 逐项启动 | 待回归 | 本轮已定位 3 个失败包是仓库内置 ZIP 截断：`1000015_1.1.4.zip`、`1000019_0.0.3.zip`、`1000024_2303.06.1630.zip`。已替换为 `/mnt/ssd/codespace/kwai-game/package-downloader/last/` 中通过 `unzip -t` 的完整包，并加固 Web 沙箱启动器。CI 真机验证目标为 14/14 可进入 `WebGameActivity` 且不出现沙箱准备失败。
@@ -42,5 +43,6 @@
 - 待 CI/真机回填：
   - debug/release workflow run-id。
   - debug arm64-v8a artifact 安装结果。
+  - 游戏列表分发策略在默认配置下显示 14 个内置游戏，远端覆盖可屏蔽指定游戏并调整排序。
   - 14 个 `assets://games/*.zip` 的 clean data 逐项启动结果。
   - `STARTED`/`STARTED_SIMULATED`/Web 回退日志证据。
