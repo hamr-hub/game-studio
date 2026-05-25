@@ -426,6 +426,8 @@ class WebGameActivity : AppCompatActivity() {
                 MouseEvent: window.MouseEvent,
                 DeviceMotionEvent: window.DeviceMotionEvent
               });
+              gameGlobal.__globalAdapter = gameGlobal.__globalAdapter || window.__globalAdapter || {};
+              window.__globalAdapter = gameGlobal.__globalAdapter;
               window.KSWebAssembly = window.KSWebAssembly || window.WebAssembly;
               window.WXWebAssembly = window.WXWebAssembly || window.WebAssembly;
 
@@ -437,7 +439,13 @@ class WebGameActivity : AppCompatActivity() {
                   'canvas',
                   'screencanvas',
                   'KSWebAssembly',
-                  'WXWebAssembly'
+                  'WXWebAssembly',
+                  'cc',
+                  'CocosEngine',
+                  'fsUtils',
+                  'DOMParser',
+                  'System',
+                  '__wxRequire'
                 ].forEach(function (name) {
                   if (gameGlobal[name] !== undefined) window[name] = gameGlobal[name];
                 });
@@ -755,8 +763,16 @@ class WebGameActivity : AppCompatActivity() {
                 var currentDir = dirname(resolved);
                 var localRequire = function (child) { return requireModule(child, currentDir); };
                 localRequire.resolve = function (child) { return resolve(child, currentDir); };
-                var wrapped = new Function('require', 'module', 'exports', '__filename', '__dirname', text + '\n//# sourceURL=' + resolved);
-                wrapped(localRequire, module, module.exports, resolved, currentDir);
+                var wrapped = new Function(
+                  'require',
+                  'module',
+                  'exports',
+                  '__filename',
+                  '__dirname',
+                  'runtimeGlobal',
+                  'with (runtimeGlobal) {\n' + text + '\n}\n//# sourceURL=' + resolved
+                );
+                wrapped.call(gameGlobal, localRequire, module, module.exports, resolved, currentDir, gameGlobal);
                 syncGameGlobalToWindow();
                 return module.exports;
               }
