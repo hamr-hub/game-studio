@@ -664,6 +664,16 @@ class WebGameActivity : AppCompatActivity() {
                   destroy: noop
                 };
               }
+              function bindMediaEvent(target, eventName) {
+                return function (cb) {
+                  if (cb) target.addEventListener(eventName, cb);
+                };
+              }
+              function unbindMediaEvent(target, eventName) {
+                return function (cb) {
+                  if (cb) target.removeEventListener(eventName, cb);
+                };
+              }
               function failUnavailable(options, message) {
                 var payload = { errMsg: message || 'api unavailable in web sandbox' };
                 options && options.fail && options.fail(payload);
@@ -789,17 +799,26 @@ class WebGameActivity : AppCompatActivity() {
                 createVideo: miniApi.createVideo || function () {
                   var video = document.createElement('video');
                   video.destroy = function () { video.remove(); };
-                  video.onPlay = function (cb) { video.addEventListener('play', cb); };
-                  video.offPlay = function (cb) { video.removeEventListener('play', cb); };
-                  video.onPause = function (cb) { video.addEventListener('pause', cb); };
-                  video.offPause = function (cb) { video.removeEventListener('pause', cb); };
-                  video.onEnded = function (cb) { video.addEventListener('ended', cb); };
-                  video.offEnded = function (cb) { video.removeEventListener('ended', cb); };
+                  video.onPlay = bindMediaEvent(video, 'play');
+                  video.offPlay = unbindMediaEvent(video, 'play');
+                  video.onPause = bindMediaEvent(video, 'pause');
+                  video.offPause = unbindMediaEvent(video, 'pause');
+                  video.onEnded = bindMediaEvent(video, 'ended');
+                  video.offEnded = unbindMediaEvent(video, 'ended');
+                  video.onCanplay = bindMediaEvent(video, 'canplay');
+                  video.offCanplay = unbindMediaEvent(video, 'canplay');
+                  video.onError = bindMediaEvent(video, 'error');
+                  video.offError = unbindMediaEvent(video, 'error');
+                  video.onWaiting = bindMediaEvent(video, 'waiting');
+                  video.offWaiting = unbindMediaEvent(video, 'waiting');
                   video.onTimeUpdate = function (cb) {
                     video.addEventListener('timeupdate', function () {
                       cb({ position: video.currentTime, duration: video.duration || 0 });
                     });
                   };
+                  video.offTimeUpdate = unbindMediaEvent(video, 'timeupdate');
+                  video.requestFullScreen = noop;
+                  video.exitFullScreen = noop;
                   video.stop = function () { video.pause(); video.currentTime = 0; return asyncOk(); };
                   video.show = noop;
                   video.hide = noop;
