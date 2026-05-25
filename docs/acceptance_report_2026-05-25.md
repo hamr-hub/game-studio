@@ -4,6 +4,7 @@
 - 验收人：Game Studio 开发协作流程
 - 设备：Samsung `SM-G9910`（`R5CR70SRPSD`）
 - CI run-id：`26397802539`（debug，提交 `640c492`）
+- 最新 main debug CI：`26398547200`（提交 `3007de0`，通过；该提交仅回填验收文档）
 - artifact：`game-studio-debug-arm64-v8a-apk`，artifact id `7197190519`
 - build 类型：debug
 - ABI：arm64-v8a
