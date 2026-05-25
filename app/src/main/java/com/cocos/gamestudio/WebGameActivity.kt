@@ -836,14 +836,6 @@ class WebGameActivity : AppCompatActivity() {
                   try { window[name] = api; } catch (ignored) {}
                 }
               }
-              function uninstallWindowApi(name) {
-                try {
-                  if (Object.prototype.hasOwnProperty.call(window, name)) delete window[name];
-                } catch (e) {}
-                try {
-                  delete Object.getPrototypeOf(window)[name];
-                } catch (e) {}
-              }
               function bindMediaEvent(target, eventName) {
                 return function (cb) {
                   if (cb) target.addEventListener(eventName, cb);
@@ -1098,7 +1090,7 @@ class WebGameActivity : AppCompatActivity() {
                   unzip: function (options) { invokeMiniCallback(options.fail, { errMsg: 'unzip is unavailable in web sandbox' }); }
                 };
               }
-              var miniApi = window.wx || {};
+              var miniApi = window.ks || window.wx || {};
               Object.assign(miniApi, {
                 env: miniApi.env || { USER_DATA_PATH: '' },
                 canIUse: miniApi.canIUse || function () { return false; },
@@ -1338,13 +1330,13 @@ class WebGameActivity : AppCompatActivity() {
                 clearStorageSync: miniApi.clearStorageSync || function () { localStorage.clear(); }
               });
               window.GameGlobal.wx = miniApi;
-              delete window.GameGlobal.ks;
-              delete window.GameGlobal.tt;
-              delete window.GameGlobal.qg;
+              window.GameGlobal.ks = miniApi;
+              window.GameGlobal.tt = miniApi;
+              window.GameGlobal.qg = miniApi;
               installNonOwnWindowApi('wx', miniApi);
-              uninstallWindowApi('ks');
-              uninstallWindowApi('tt');
-              uninstallWindowApi('qg');
+              installNonOwnWindowApi('ks', miniApi);
+              installNonOwnWindowApi('tt', miniApi);
+              installNonOwnWindowApi('qg', miniApi);
               syncGameGlobalToWindow();
 
               var moduleCache = {};
