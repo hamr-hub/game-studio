@@ -383,6 +383,38 @@ class WebGameActivity : AppCompatActivity() {
               window.screencanvas = window.screencanvas || canvas;
               window.__webSandboxLoaded = {};
 
+              function makeWindowPropertyWritable(name, fallback) {
+                try {
+                  Object.defineProperty(window, name, {
+                    value: window[name] || fallback,
+                    writable: true,
+                    configurable: true
+                  });
+                } catch (e) {}
+              }
+              [
+                'canvas',
+                'navigator',
+                'XMLHttpRequest',
+                'WebSocket',
+                'Image',
+                'ImageBitmap',
+                'Audio',
+                'FileReader',
+                'HTMLElement',
+                'HTMLImageElement',
+                'HTMLCanvasElement',
+                'HTMLMediaElement',
+                'HTMLAudioElement',
+                'HTMLVideoElement',
+                'WebGLRenderingContext',
+                'TouchEvent',
+                'MouseEvent',
+                'DeviceMotionEvent',
+                'localStorage',
+                'location'
+              ].forEach(function (name) { makeWindowPropertyWritable(name, window[name]); });
+
               if (window.EventTarget && window.Event && !EventTarget.prototype.__webSandboxDispatchPatched) {
                 var nativeDispatchEvent = EventTarget.prototype.dispatchEvent;
                 EventTarget.prototype.__webSandboxDispatchPatched = true;
