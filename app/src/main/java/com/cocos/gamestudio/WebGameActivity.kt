@@ -376,12 +376,53 @@ class WebGameActivity : AppCompatActivity() {
         return """
             (function () {
               var canvas = document.getElementById('GameCanvas');
+              var gameGlobal = window.GameGlobal && window.GameGlobal !== window ? window.GameGlobal : {};
               window.canvas = canvas;
-              window.GameGlobal = window.GameGlobal || window;
-              window.global = window;
+              window.GameGlobal = gameGlobal;
+              window.global = gameGlobal;
               window.globalThis = window;
               window.screencanvas = window.screencanvas || canvas;
               window.__webSandboxLoaded = {};
+
+              Object.assign(gameGlobal, {
+                window: window,
+                GameGlobal: gameGlobal,
+                global: gameGlobal,
+                globalThis: gameGlobal,
+                self: gameGlobal,
+                parent: gameGlobal,
+                top: gameGlobal,
+                document: document,
+                navigator: navigator,
+                location: location,
+                localStorage: localStorage,
+                screen: screen,
+                performance: performance,
+                canvas: canvas,
+                screencanvas: canvas,
+                setTimeout: setTimeout.bind(window),
+                setInterval: setInterval.bind(window),
+                clearTimeout: clearTimeout.bind(window),
+                clearInterval: clearInterval.bind(window),
+                requestAnimationFrame: requestAnimationFrame.bind(window),
+                cancelAnimationFrame: cancelAnimationFrame.bind(window),
+                XMLHttpRequest: window.XMLHttpRequest,
+                WebSocket: window.WebSocket,
+                Image: window.Image,
+                ImageBitmap: window.ImageBitmap,
+                Audio: window.Audio,
+                FileReader: window.FileReader,
+                HTMLElement: window.HTMLElement,
+                HTMLImageElement: window.HTMLImageElement,
+                HTMLCanvasElement: window.HTMLCanvasElement,
+                HTMLMediaElement: window.HTMLMediaElement,
+                HTMLAudioElement: window.HTMLAudioElement,
+                HTMLVideoElement: window.HTMLVideoElement,
+                WebGLRenderingContext: window.WebGLRenderingContext,
+                TouchEvent: window.TouchEvent,
+                MouseEvent: window.MouseEvent,
+                DeviceMotionEvent: window.DeviceMotionEvent
+              });
 
               function makeWindowPropertyWritable(name, fallback) {
                 try {
