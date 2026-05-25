@@ -380,12 +380,12 @@ class WebGameActivity : AppCompatActivity() {
               window.canvas = canvas;
               window.GameGlobal = gameGlobal;
               window.global = gameGlobal;
-              window.globalThis = window;
+              window.globalThis = gameGlobal;
               window.screencanvas = window.screencanvas || canvas;
               window.__webSandboxLoaded = {};
 
               Object.assign(gameGlobal, {
-                window: window,
+                window: gameGlobal,
                 GameGlobal: gameGlobal,
                 global: gameGlobal,
                 globalThis: gameGlobal,
@@ -423,6 +423,20 @@ class WebGameActivity : AppCompatActivity() {
                 MouseEvent: window.MouseEvent,
                 DeviceMotionEvent: window.DeviceMotionEvent
               });
+
+              function syncGameGlobalToWindow() {
+                [
+                  '__globalAdapter',
+                  'ks',
+                  'wx',
+                  'canvas',
+                  'screencanvas',
+                  'KSWebAssembly',
+                  'WXWebAssembly'
+                ].forEach(function (name) {
+                  if (gameGlobal[name] !== undefined) window[name] = gameGlobal[name];
+                });
+              }
 
               function makeWindowPropertyWritable(name, fallback) {
                 try {
@@ -675,6 +689,8 @@ class WebGameActivity : AppCompatActivity() {
               window.ks = miniApi;
               window.wx = miniApi;
               window.GameGlobal.wx = miniApi;
+              window.GameGlobal.ks = miniApi;
+              syncGameGlobalToWindow();
 
               var moduleCache = {};
               var textCache = {};
@@ -736,6 +752,7 @@ class WebGameActivity : AppCompatActivity() {
                 localRequire.resolve = function (child) { return resolve(child, currentDir); };
                 var wrapped = new Function('require', 'module', 'exports', '__filename', '__dirname', text + '\n//# sourceURL=' + resolved);
                 wrapped(localRequire, module, module.exports, resolved, currentDir);
+                syncGameGlobalToWindow();
                 return module.exports;
               }
               window.require = function (request) { return requireModule(request, ''); };
