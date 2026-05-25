@@ -460,10 +460,16 @@ class WebGameActivity : AppCompatActivity() {
                 var match = path.match(/^src\/(?:scripts|bundle-scripts)\/([^\/]+)(?:\/index\.js)?${'$'}/);
                 return match ? 'assets/' + match[1] + '/index.js' : null;
               }
+              function cocosAssetAlias(path) {
+                var clean = path.replace(/^\.\//, '');
+                var match = clean.match(/^(internal|resources|main|start-scene|share-images)\/(.+)/);
+                return match ? 'assets/' + match[1] + '/' + match[2] : null;
+              }
               function cocosModuleCandidates(path) {
                 var candidates = [path];
-                var alias = cocosBundleAlias(path);
-                if (alias && alias !== path) candidates.push(alias);
+                [cocosBundleAlias(path), cocosAssetAlias(path)].forEach(function (alias) {
+                  if (alias && candidates.indexOf(alias) < 0) candidates.push(alias);
+                });
                 return candidates;
               }
               function wrapCocosRequire(fn) {
@@ -635,14 +641,22 @@ class WebGameActivity : AppCompatActivity() {
                   }
                 };
               }
-              function loadLocalText(path) {
+              function tryLoadLocalText(path) {
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', path, false);
-                try { xhr.send(null); } catch (e) { throw e; }
+                try { xhr.send(null); } catch (e) { return null; }
                 if (xhr.status >= 400 || (xhr.status === 0 && !xhr.responseText)) {
-                  throw new Error('file not found: ' + path);
+                  return null;
                 }
                 return xhr.responseText;
+              }
+              function loadLocalText(path) {
+                var candidates = cocosModuleCandidates(path);
+                for (var i = 0; i < candidates.length; i++) {
+                  var text = tryLoadLocalText(candidates[i]);
+                  if (text !== null) return text;
+                }
+                throw new Error('file not found: ' + path);
               }
               function fileSystemManager() {
                 return {
