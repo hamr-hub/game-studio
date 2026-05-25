@@ -879,7 +879,11 @@ class WebGameActivity : AppCompatActivity() {
                 path = normalize(path);
                 var candidates = [];
                 cocosModuleCandidates(path).forEach(function (candidate) {
-                  candidates.push(candidate, candidate + '.js', candidate + '.json', candidate + '/index.js');
+                  if (hasFileExtension(candidate)) {
+                    candidates.push(candidate);
+                  } else {
+                    candidates.push(candidate + '.js', candidate + '.json', candidate + '/index.js', candidate);
+                  }
                 });
                 for (var i = 0; i < candidates.length; i++) {
                   var url = candidates[i];
@@ -905,6 +909,9 @@ class WebGameActivity : AppCompatActivity() {
                 if (text === null) throw new Error('Cannot load module ' + path);
                 textCache[path] = text;
                 return text;
+              }
+              function hasFileExtension(path) {
+                return /\.[^\/.]+${'$'}/.test(path);
               }
               function requireModule(request, parentDir) {
                 var resolved = resolve(request, parentDir || '');
