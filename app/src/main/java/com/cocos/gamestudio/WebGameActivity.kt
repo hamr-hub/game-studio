@@ -33,6 +33,8 @@ class WebGameActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        val configuredOrientation = applyConfiguredOrientation(intent.getStringExtra(GameActivity.EXTRA_GAME_ORIENTATION))
 
         webView = WebView(this)
         setContentView(webView)
@@ -44,7 +46,7 @@ class WebGameActivity : AppCompatActivity() {
         }
 
         setupWebView()
-        runWebGame(gamePath)
+        runWebGame(gamePath, configuredOrientation)
     }
 
     private fun setupWebView() {
@@ -95,7 +97,7 @@ class WebGameActivity : AppCompatActivity() {
         return true
     }
 
-    private fun runWebGame(path: String) {
+    private fun runWebGame(path: String, hasConfiguredOrientation: Boolean) {
         val normalizedPath = normalizeAssetPath(path)
         val baseDir = prepareGameSandbox(normalizedPath)
         if (baseDir == null) {
@@ -105,7 +107,9 @@ class WebGameActivity : AppCompatActivity() {
             return
         }
 
-        applyPackageOrientation(baseDir)
+        if (!hasConfiguredOrientation) {
+            applyPackageOrientation(baseDir)
+        }
         val entryHtml = resolveEntryHtml(baseDir)
         Log.i(TAG, "Loading web sandbox entry ${entryHtml.absolutePath}")
         webView.loadUrl("file://${entryHtml.absolutePath}")
@@ -407,6 +411,15 @@ class WebGameActivity : AppCompatActivity() {
                 ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
             else -> requestedOrientation
         }
+    }
+
+    private fun applyConfiguredOrientation(rawOrientation: String?): Boolean {
+        val orientation = GameOrientation.normalize(rawOrientation.orEmpty()) ?: return false
+        requestedOrientation = when (orientation) {
+            GameOrientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+            else -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        }
+        return true
     }
 
     private fun writeDiagnosticsHtml(root: File, message: String): File {

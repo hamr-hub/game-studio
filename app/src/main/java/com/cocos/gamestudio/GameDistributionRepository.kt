@@ -122,6 +122,7 @@ data class GameDistributionEntry(
     val order: Int?,
     val displayName: String?,
     val description: String?,
+    val orientation: String?,
     val iconLabel: String?,
     val iconColor: String?,
     val iconUri: String?,
@@ -147,6 +148,7 @@ data class GameDistributionEntry(
             order = override.order ?: order,
             displayName = override.displayName ?: displayName,
             description = override.description ?: description,
+            orientation = override.orientation ?: orientation,
             iconLabel = override.iconLabel ?: iconLabel,
             iconColor = override.iconColor ?: iconColor,
             iconUri = override.iconUri ?: iconUri,
@@ -386,6 +388,11 @@ object GameDistributionRepository {
             order = explicitOrder ?: fallbackOrder,
             displayName = optString(item, "displayName") ?: optString(item, "display_name") ?: optString(item, "name") ?: optString(item, "title"),
             description = optString(item, "description") ?: optString(item, "subtitle"),
+            orientation = optString(item, "orientation")
+                ?: optString(item, "screenOrientation")
+                ?: optString(item, "screen_orientation")
+                ?: optString(item, "deviceOrientation")
+                ?: optString(item, "device_orientation"),
             iconLabel = optString(item, "iconLabel") ?: optString(item, "icon_label") ?: icon?.let { optString(it, "label") },
             iconColor = optString(item, "iconColor") ?: optString(item, "icon_color") ?: icon?.let { optString(it, "color") },
             iconUri = optString(item, "iconUrl")

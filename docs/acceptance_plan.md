@@ -15,7 +15,7 @@
 | 原生初始化与启动状态 | Native 能返回可观测状态并驱动 App 回退策略 | 1) 在 `GameActivity` 启动后读取 `nativeGetBootstrapStatus`；2) 对 `STARTED`/`STARTED_SIMULATED`/异常码执行不同分支 | `STARTED` 进入原生渲染；其他状态触发 Web 回退 |
 | 启动性能与入口识别 | `assets://` 包扫描与入口检测稳定通过 | 1) 检查 `nativeGetPackageSummary` 和日志中是否包含 `analyzed` 信息；2) 检查 main entry 候选与入口语义判定字段 | 游戏包在启动时能识别到 `main_entry`，并给出 bootstrap 状态 |
 | Web 回退沙箱 | 原生不可完整运行时，WebView 能解包并启动每个内置小游戏 | 1) clean app data；2) 逐项以 `adb am start ... -e GAME_PATH assets://games/<zip>` 启动 14 个内置包；3) 检查 `WebGameActivity`、`GameCanvas`、console 日志和触摸响应 | 14/14 包进入 Web 沙箱；不出现 `Cannot prepare web sandbox`、`ReferenceError: require is not defined` 或损坏 ZIP 解包失败 |
-| 游戏列表分发策略 | 支持服务端通过 `tailNumber` 开关、显隐字段、排序和展示元数据控制列表动态渲染 | 1) 使用内置 `game_distribution.json` 启动列表；2) 配置远端 JSON 后重新进入列表；3) 验证 `tailNumber`、`visible`/`hidden`、`order`、`displayName`、`description`、`icon` 生效 | 尾号不匹配或被屏蔽游戏不展示且不出现在最近游戏；排序与配置一致；列表卡片和详情弹层展示配置名称、说明和图标 |
+| 游戏列表分发策略 | 支持服务端通过 `tailNumber` 开关、显隐字段、排序、展示元数据和横竖屏控制列表动态渲染 | 1) 使用内置 `game_distribution.json` 启动列表；2) 配置远端 JSON 后重新进入列表；3) 验证 `tailNumber`、`visible`/`hidden`、`order`、`displayName`、`description`、`icon`、`orientation` 生效 | 尾号不匹配或被屏蔽游戏不展示且不出现在最近游戏；排序与配置一致；列表卡片和详情弹层展示配置名称、说明和图标；启动游戏后方向与配置一致 |
 | FPS 与帧耗时 | 左上角实时显示性能指标 | 进入游戏 > 1 秒后读取左上角文字与更新频率 | 每 1s 更新一次指标，包含 FPS/帧耗时 |
 | 原生日志控制台 | 支持查看并按级别过滤日志 | 1) 打开 console 面板；2) 切换 ALL/INFO/WARN/ERROR | 控制台可显示并按颜色/过滤器区分日志 |
 | 设置透传与生效 | 设置页修改 FPS 并影响游戏运行 | 1) 在 Settings 修改 FPS；2) 回到运行页观察指标变化 | 游戏统计中的 FPS 变化与设置一致 |

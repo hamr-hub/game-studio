@@ -11,6 +11,7 @@ data class GameEntry(
     val file: File,
     val displayName: String,
     val description: String,
+    val orientation: String,
     val iconLabel: String,
     val iconColor: Int,
     val iconUri: String?,
@@ -147,6 +148,7 @@ object GameCatalog {
             file = file,
             displayName = displayName,
             description = "This game package is ready to launch.",
+            orientation = GameOrientation.LANDSCAPE,
             iconLabel = iconLabel,
             iconColor = color,
             iconUri = null,
@@ -174,6 +176,7 @@ object GameCatalog {
         return entry.copy(
             displayName = displayName,
             description = metadata?.description?.trim()?.takeIf { it.isNotEmpty() } ?: entry.description,
+            orientation = metadata?.orientation?.let { GameOrientation.normalize(it) } ?: entry.orientation,
             iconLabel = iconLabel,
             iconColor = iconColor,
             iconUri = metadata?.iconUri?.trim()?.takeIf { it.isNotEmpty() } ?: entry.iconUri,
@@ -186,6 +189,19 @@ object GameCatalog {
             android.graphics.Color.parseColor(value)
         } catch (_: Exception) {
             null
+        }
+    }
+}
+
+object GameOrientation {
+    const val LANDSCAPE = "landscape"
+    const val PORTRAIT = "portrait"
+
+    fun normalize(value: String): String? {
+        return when (value.trim().lowercase()) {
+            LANDSCAPE, "sensor_landscape", "sensorlandscape", "landscape_sensor" -> LANDSCAPE
+            PORTRAIT, "sensor_portrait", "sensorportrait", "portrait_sensor" -> PORTRAIT
+            else -> null
         }
     }
 }

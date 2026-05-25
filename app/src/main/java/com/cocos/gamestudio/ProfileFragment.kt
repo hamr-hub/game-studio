@@ -80,6 +80,7 @@ class ProfileFragment : Fragment() {
         adapter = GameListActivity.GameAdapter(emptyList()) { game ->
             val intent = Intent(requireContext(), GameActivity::class.java).apply {
                 putExtra("GAME_PATH", game.file.path)
+                putExtra(GameActivity.EXTRA_GAME_ORIENTATION, game.orientation)
             }
             startActivity(intent)
         }

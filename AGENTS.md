@@ -152,6 +152,7 @@ The Game Studio project has been optimized with several advanced features:
 
 ## 最近执行更新
 
+- 2026-05-25：游戏分发配置新增每个游戏的 `orientation` 字段，客户端启动原生页和 Web 回退页时按配置动态设置横屏或竖屏。
 - 2026-05-25：默认游戏分发改为服务端风格 `tailNumber` 开关，客户端按游戏 ID 后 2 位动态渲染 `1000010` 到 `1000030` 闭区间内已有游戏，其他游戏由尾号规则屏蔽。
 - 2026-05-25：新增 App 游戏列表分发策略，支持通过 `game_distribution.json` 与远端 JSON 控制游戏可见性、排序、展示名称、说明和图标；相关说明见 `docs/game_distribution_strategy.md`。
 - 2026-05-25：完成 `assets://` 路径归一化修复后的 CI 真机验收记录，新增 `docs/acceptance_report_2026-05-25.md`，并将 `docs/acceptance_plan.md` 生效时间更新到当前版本日期。

@@ -7,6 +7,7 @@ App 游戏列表不再只按本地 ZIP 文件名展示，而是通过分发配�
 - 哪些游戏对用户可见。
 - 游戏在列表中的展示顺序。
 - 游戏对外展示名称、说明、文字图标、图标颜色和图片图标。
+- 每个游戏启动时使用横屏或竖屏。
 
 ## 配置来源
 
@@ -27,6 +28,7 @@ App 游戏列表不再只按本地 ZIP 文件名展示，而是通过分发配�
 - `visible: false` 或 `hidden: true` 会将游戏从列表和最近游戏中屏蔽。
 - `defaultVisible: false` 可切换为服务端白名单模式，未配置的游戏默认不展示。
 - `tailNumber.enabled: true` 会启用尾号开关，客户端按游戏 ID 的后 `digits` 位动态过滤，可配 `min`/`max`、`allow`、`deny`。
+- `orientation` 支持 `landscape` 和 `portrait`，用于启动原生运行页和 Web 回退页时设置方向；未配置时默认 `landscape`。
 - `order` 越小越靠前；未配置 `order` 时，数组配置会使用数组顺序，对象配置不会改变已有排序。
 - 排序兜底规则为 `order`、展示名、资源包名。
 - `icon.label` 建议控制在 1 到 3 个字符，App 会截断过长的文字兜底图标。
@@ -51,6 +53,7 @@ App 游戏列表不再只按本地 ZIP 文件名展示，而是通过分发配�
       "order": 10,
       "displayName": "Featured Game",
       "description": "Public copy shown in the game detail sheet.",
+      "orientation": "portrait",
       "icon": {
         "label": "FG",
         "color": "#4DB6AC",

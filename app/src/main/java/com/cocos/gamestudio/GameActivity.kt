@@ -2,6 +2,7 @@ package com.cocos.gamestudio
 
 import android.content.ContentValues
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Build
@@ -43,6 +44,7 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
     private var startTime: Long = 0
     private var gamePath: String = ""
     private var requestedPath: String = ""
+    private var gameOrientation: String = GameOrientation.LANDSCAPE
     
     private val handler = Handler(Looper.getMainLooper())
     private val statsUpdater = object : Runnable {
@@ -85,6 +87,7 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        applyRequestedGameOrientation(intent.getStringExtra(EXTRA_GAME_ORIENTATION))
 
         val root = FrameLayout(this)
         
@@ -218,8 +221,17 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
         val targetPath = if (requestedPath.isBlank()) gamePath else requestedPath
         startActivity(Intent(this, WebGameActivity::class.java).apply {
             putExtra("GAME_PATH", targetPath)
+            putExtra(EXTRA_GAME_ORIENTATION, gameOrientation)
         })
         finish()
+    }
+
+    private fun applyRequestedGameOrientation(rawOrientation: String?) {
+        gameOrientation = GameOrientation.normalize(rawOrientation.orEmpty()) ?: GameOrientation.LANDSCAPE
+        requestedOrientation = when (gameOrientation) {
+            GameOrientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+            else -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        }
     }
 
     private fun takeScreenshot() {
@@ -355,5 +367,9 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
         if (nativeEngineHandle != 0L) {
             NativeEngine.nativeResume(nativeEngineHandle)
         }
+    }
+
+    companion object {
+        const val EXTRA_GAME_ORIENTATION = "GAME_ORIENTATION"
     }
 }

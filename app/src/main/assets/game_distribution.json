@@ -15,6 +15,7 @@
       "order": 10,
       "displayName": "Game 1000000",
       "description": "Built-in game package 1000000.",
+      "orientation": "landscape",
       "icon": {
         "label": "00",
         "color": "#4DB6AC"
@@ -27,6 +28,7 @@
       "order": 20,
       "displayName": "Game 1000001",
       "description": "Built-in game package 1000001.",
+      "orientation": "landscape",
       "icon": {
         "label": "01",
         "color": "#FF8A65"
@@ -39,6 +41,7 @@
       "order": 30,
       "displayName": "Game 1000006",
       "description": "Built-in game package 1000006.",
+      "orientation": "landscape",
       "icon": {
         "label": "06",
         "color": "#9575CD"
@@ -51,6 +54,7 @@
       "order": 40,
       "displayName": "Game 1000007",
       "description": "Built-in game package 1000007.",
+      "orientation": "landscape",
       "icon": {
         "label": "07",
         "color": "#64B5F6"
@@ -63,6 +67,7 @@
       "order": 10,
       "displayName": "Game 1000013",
       "description": "Built-in game package 1000013.",
+      "orientation": "landscape",
       "icon": {
         "label": "13",
         "color": "#BA68C8"
@@ -75,6 +80,7 @@
       "order": 20,
       "displayName": "Game 1000015",
       "description": "Built-in game package 1000015.",
+      "orientation": "landscape",
       "icon": {
         "label": "15",
         "color": "#8E6C00"
@@ -87,6 +93,7 @@
       "order": 30,
       "displayName": "Game 1000016",
       "description": "Built-in game package 1000016.",
+      "orientation": "landscape",
       "icon": {
         "label": "16",
         "color": "#81C784"
@@ -99,6 +106,7 @@
       "order": 40,
       "displayName": "Game 1000017",
       "description": "Built-in game package 1000017.",
+      "orientation": "landscape",
       "icon": {
         "label": "17",
         "color": "#A45500"
@@ -111,6 +119,7 @@
       "order": 50,
       "displayName": "Game 1000018",
       "description": "Built-in game package 1000018.",
+      "orientation": "landscape",
       "icon": {
         "label": "18",
         "color": "#7986CB"
@@ -123,6 +132,7 @@
       "order": 60,
       "displayName": "Game 1000019",
       "description": "Built-in game package 1000019.",
+      "orientation": "landscape",
       "icon": {
         "label": "19",
         "color": "#4FC3F7"
@@ -135,6 +145,7 @@
       "order": 70,
       "displayName": "Game 1000024",
       "description": "Built-in game package 1000024.",
+      "orientation": "landscape",
       "icon": {
         "label": "24",
         "color": "#A1887F"
@@ -147,6 +158,7 @@
       "order": 80,
       "displayName": "Game 1000026",
       "description": "Built-in game package 1000026.",
+      "orientation": "landscape",
       "icon": {
         "label": "26",
         "color": "#90A4AE"
@@ -159,6 +171,7 @@
       "order": 90,
       "displayName": "Game 1000027",
       "description": "Built-in game package 1000027.",
+      "orientation": "landscape",
       "icon": {
         "label": "27",
         "color": "#F06292"
@@ -171,6 +184,7 @@
       "order": 140,
       "displayName": "Game 1000031",
       "description": "Built-in game package 1000031.",
+      "orientation": "landscape",
       "icon": {
         "label": "31",
         "color": "#4DD0E1"
