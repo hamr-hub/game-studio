@@ -48,7 +48,7 @@ object GameCatalog {
     fun loadLastPlayed(context: Context, serialized: String): List<GameEntry> {
         if (serialized.isBlank()) return emptyList()
         // Use cached if available, but this is a sync call usually from ProfileFragment
-        val available = (cachedGames ?: emptyList()).associateBy { it.file.absolutePath }
+        val available = (cachedGames ?: emptyList()).associateBy { it.file.path }
         return serialized
             .split(",")
             .mapNotNull { raw -> available[raw] }
@@ -95,14 +95,15 @@ object GameCatalog {
     }
 
     private fun toEntry(context: Context?, file: File): GameEntry {
-        val name = if (file.absolutePath.startsWith("assets://")) {
-            file.absolutePath.substringAfterLast("/")
+        val path = file.path
+        val name = if (path.startsWith("assets://")) {
+            path.substringAfterLast("/")
         } else {
             file.name
         }
-        val size = if (file.absolutePath.startsWith("assets://") && context != null) {
+        val size = if (path.startsWith("assets://") && context != null) {
             try {
-                val assetPath = file.absolutePath.removePrefix("assets://").trimStart('/')
+                val assetPath = path.removePrefix("assets://").trimStart('/')
                 context.assets.open(assetPath).use { it.available().toLong() }
             } catch (_: Exception) {
                 0L

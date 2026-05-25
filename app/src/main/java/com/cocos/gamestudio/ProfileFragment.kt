@@ -79,7 +79,7 @@ class ProfileFragment : Fragment() {
         recentGamesRv.layoutManager = LinearLayoutManager(context)
         adapter = GameListActivity.GameAdapter(emptyList()) { game ->
             val intent = Intent(requireContext(), GameActivity::class.java).apply {
-                putExtra("GAME_PATH", game.file.absolutePath)
+                putExtra("GAME_PATH", game.file.path)
             }
             startActivity(intent)
         }
