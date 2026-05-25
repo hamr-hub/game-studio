@@ -645,6 +645,11 @@ class WebGameActivity : AppCompatActivity() {
                   catch: noop
                 };
               }
+              function invokeMiniCallback(callback, value) {
+                if (callback) {
+                  setTimeout(function () { callback(value || {}); }, 0);
+                }
+              }
               function eventHandle() {
                 return {
                   onClose: noop,
@@ -710,18 +715,18 @@ class WebGameActivity : AppCompatActivity() {
                 return {
                   readFile: function (options) {
                     try {
-                      options.success && options.success({ data: loadLocalText(options.filePath) });
+                      invokeMiniCallback(options.success, { data: loadLocalText(options.filePath) });
                     } catch (e) {
-                      options.fail && options.fail({ errMsg: e.message });
+                      invokeMiniCallback(options.fail, { errMsg: e.message });
                     }
                   },
                   readFileSync: function (path) { return loadLocalText(path); },
                   access: function (options) {
                     try {
                       loadLocalText(options.path);
-                      options.success && options.success({});
+                      invokeMiniCallback(options.success, {});
                     } catch (e) {
-                      options.fail && options.fail({ errMsg: e.message });
+                      invokeMiniCallback(options.fail, { errMsg: e.message });
                     }
                   },
                   accessSync: function (options) {
@@ -730,15 +735,15 @@ class WebGameActivity : AppCompatActivity() {
                     return null;
                   },
                   readdir: function (options) {
-                    options.fail && options.fail({ errMsg: 'readdir is unavailable in web sandbox' });
+                    invokeMiniCallback(options.fail, { errMsg: 'readdir is unavailable in web sandbox' });
                   },
                   mkdirSync: noop,
                   rmdirSync: noop,
-                  unlink: function (options) { options.success && options.success({}); },
-                  copyFile: function (options) { options.fail && options.fail({ errMsg: 'copyFile is unavailable in web sandbox' }); },
-                  writeFile: function (options) { options.success && options.success({}); },
+                  unlink: function (options) { invokeMiniCallback(options.success, {}); },
+                  copyFile: function (options) { invokeMiniCallback(options.fail, { errMsg: 'copyFile is unavailable in web sandbox' }); },
+                  writeFile: function (options) { invokeMiniCallback(options.success, {}); },
                   writeFileSync: function () { return null; },
-                  unzip: function (options) { options.fail && options.fail({ errMsg: 'unzip is unavailable in web sandbox' }); }
+                  unzip: function (options) { invokeMiniCallback(options.fail, { errMsg: 'unzip is unavailable in web sandbox' }); }
                 };
               }
               var miniApi = window.ks || window.wx || {};
