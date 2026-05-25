@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.system.Os
 import android.util.Log
 import android.webkit.ConsoleMessage
 import android.webkit.WebResourceRequest
@@ -133,10 +134,10 @@ class WebGameActivity : AppCompatActivity() {
             "web-fallback/${sha1Hex("${source.absolutePath}:${source.length()}:${source.lastModified()}")}",
         )
         if (isPreparedSandbox(sandboxRoot)) {
-            return sandboxRoot
+            return finalizePreparedSandbox(sandboxRoot)
         }
 
-        return if (unpackZip(source, sandboxRoot)) sandboxRoot else null
+        return if (unpackZip(source, sandboxRoot)) finalizePreparedSandbox(sandboxRoot) else null
     }
 
     private fun prepareAssetGameSandbox(path: String): File? {
@@ -153,17 +154,51 @@ class WebGameActivity : AppCompatActivity() {
 
         val sandboxRoot = File(cacheDir, "web-fallback/assets-${sha1Hex("$relative:$assetSize")}")
         if (isPreparedSandbox(sandboxRoot)) {
-            return sandboxRoot
+            return finalizePreparedSandbox(sandboxRoot)
         }
 
         return try {
             assets.open(relative).use { input ->
                 val ok = unpackZipFromInput(input, sandboxRoot, true)
-                if (ok) sandboxRoot else null
+                if (ok) finalizePreparedSandbox(sandboxRoot) else null
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed unpacking asset game package $relative", e)
             null
+        }
+    }
+
+    private fun finalizePreparedSandbox(root: File): File {
+        createCocosAssetAliases(root)
+        return root
+    }
+
+    private fun createCocosAssetAliases(root: File) {
+        val assetsRoot = File(root, "assets")
+        if (!assetsRoot.isDirectory) {
+            return
+        }
+
+        COCOS_BUNDLE_ALIASES.forEach { bundleName ->
+            val source = File(assetsRoot, bundleName)
+            val target = File(root, bundleName)
+            if (!source.exists() || target.exists()) {
+                return@forEach
+            }
+
+            try {
+                Os.symlink(source.absolutePath, target.absolutePath)
+            } catch (_: Exception) {
+                try {
+                    source.copyRecursively(target, overwrite = false)
+                } catch (copyError: Exception) {
+                    Log.w(
+                        TAG,
+                        "Unable to create Cocos asset alias ${target.name}",
+                        copyError,
+                    )
+                }
+            }
         }
     }
 
@@ -938,6 +973,13 @@ class WebGameActivity : AppCompatActivity() {
     companion object {
         private const val ASSET_GAME_PREFIX = "assets://"
         private const val SANDBOX_READY_FILE = ".web-sandbox-ready"
+        private val COCOS_BUNDLE_ALIASES = listOf(
+            "internal",
+            "resources",
+            "main",
+            "start-scene",
+            "share-images",
+        )
 
         fun start(context: Context, gamePath: String) {
             context.startActivity(Intent(context, WebGameActivity::class.java).apply {
