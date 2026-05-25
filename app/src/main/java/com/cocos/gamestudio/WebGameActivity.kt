@@ -670,6 +670,16 @@ class WebGameActivity : AppCompatActivity() {
                 options && options.complete && options.complete(payload);
                 return asyncOk(payload);
               }
+              function loadSubpackageScript(name) {
+                if (!name) return;
+                var loader = window.__wxRequire || window.require;
+                if (!loader) return;
+                try {
+                  loader('./subpackages/' + name + '/game.js');
+                } catch (e) {
+                  loader('subpackages/' + name + '/game.js');
+                }
+              }
               function systemInfo() {
                 return {
                   brand: 'Android',
@@ -808,7 +818,17 @@ class WebGameActivity : AppCompatActivity() {
                   return { onProgressUpdate: noop };
                 },
                 loadSubpackage: miniApi.loadSubpackage || function (options) {
-                  options && options.success && options.success({});
+                  setTimeout(function () {
+                    try {
+                      loadSubpackageScript(options && (options.name || options.root));
+                      options && options.success && options.success({});
+                      options && options.complete && options.complete({});
+                    } catch (e) {
+                      var payload = { errMsg: e.message || String(e) };
+                      options && options.fail && options.fail(payload);
+                      options && options.complete && options.complete(payload);
+                    }
+                  }, 0);
                   return { onProgressUpdate: noop };
                 },
                 navigateToMiniProgram: miniApi.navigateToMiniProgram || function (options) {
@@ -847,6 +867,8 @@ class WebGameActivity : AppCompatActivity() {
                 showShareMenu: miniApi.showShareMenu || noop,
                 hideShareMenu: miniApi.hideShareMenu || noop,
                 shareAppMessage: miniApi.shareAppMessage || noop,
+                onShareAppMessage: miniApi.onShareAppMessage || noop,
+                offShareAppMessage: miniApi.offShareAppMessage || noop,
                 setPreferredFramesPerSecond: miniApi.setPreferredFramesPerSecond || noop,
                 onTouchStart: miniApi.onTouchStart || function (cb) { canvas.addEventListener('touchstart', cb, { passive: false }); },
                 onTouchMove: miniApi.onTouchMove || function (cb) { canvas.addEventListener('touchmove', cb, { passive: false }); },
