@@ -394,7 +394,13 @@ class WebGameActivity : AppCompatActivity() {
               }
               [
                 'canvas',
+                'document',
                 'navigator',
+                'screen',
+                'performance',
+                'parent',
+                'top',
+                'self',
                 'XMLHttpRequest',
                 'WebSocket',
                 'Image',
