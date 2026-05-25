@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import android.webkit.ConsoleMessage
+import android.webkit.WebResourceRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -66,7 +67,31 @@ class WebGameActivity : AppCompatActivity() {
                 return true
             }
         }
-        webView.webViewClient = WebViewClient()
+        webView.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                return shouldBlockExternalNavigation(request?.url?.toString(), request?.isForMainFrame ?: true)
+            }
+
+            @Suppress("OVERRIDE_DEPRECATION")
+            override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                return shouldBlockExternalNavigation(url, true)
+            }
+        }
+    }
+
+    private fun shouldBlockExternalNavigation(url: String?, isForMainFrame: Boolean): Boolean {
+        if (url.isNullOrBlank()) {
+            return false
+        }
+
+        val scheme = url.substringBefore(':', "").lowercase()
+        val sandboxScheme = scheme in setOf("file", "about", "data", "blob")
+        if (sandboxScheme || (!isForMainFrame && scheme in setOf("http", "https"))) {
+            return false
+        }
+
+        Log.w(TAG, "Blocked external web navigation: $url")
+        return true
     }
 
     private fun runWebGame(path: String) {
@@ -580,6 +605,12 @@ class WebGameActivity : AppCompatActivity() {
                   destroy: noop
                 };
               }
+              function failUnavailable(options, message) {
+                var payload = { errMsg: message || 'api unavailable in web sandbox' };
+                options && options.fail && options.fail(payload);
+                options && options.complete && options.complete(payload);
+                return asyncOk(payload);
+              }
               function systemInfo() {
                 return {
                   brand: 'Android',
@@ -712,6 +743,42 @@ class WebGameActivity : AppCompatActivity() {
                   options && options.success && options.success({});
                   return { onProgressUpdate: noop };
                 },
+                navigateToMiniProgram: miniApi.navigateToMiniProgram || function (options) {
+                  return failUnavailable(options, 'navigateToMiniProgram is unavailable in web sandbox');
+                },
+                navigateBackMiniProgram: miniApi.navigateBackMiniProgram || function (options) {
+                  return failUnavailable(options, 'navigateBackMiniProgram is unavailable in web sandbox');
+                },
+                openEmbeddedMiniProgram: miniApi.openEmbeddedMiniProgram || function (options) {
+                  return failUnavailable(options, 'openEmbeddedMiniProgram is unavailable in web sandbox');
+                },
+                exitMiniProgram: miniApi.exitMiniProgram || function (options) {
+                  return failUnavailable(options, 'exitMiniProgram is ignored in web sandbox');
+                },
+                openCustomerServiceConversation: miniApi.openCustomerServiceConversation || function (options) {
+                  return failUnavailable(options, 'openCustomerServiceConversation is unavailable in web sandbox');
+                },
+                showToast: miniApi.showToast || function (options) {
+                  options && options.success && options.success({});
+                  options && options.complete && options.complete({});
+                  return asyncOk();
+                },
+                hideToast: miniApi.hideToast || noop,
+                showLoading: miniApi.showLoading || function (options) {
+                  options && options.success && options.success({});
+                  options && options.complete && options.complete({});
+                  return asyncOk();
+                },
+                hideLoading: miniApi.hideLoading || noop,
+                showModal: miniApi.showModal || function (options) {
+                  var payload = { confirm: false, cancel: true };
+                  options && options.success && options.success(payload);
+                  options && options.complete && options.complete(payload);
+                  return asyncOk(payload);
+                },
+                showShareMenu: miniApi.showShareMenu || noop,
+                hideShareMenu: miniApi.hideShareMenu || noop,
+                shareAppMessage: miniApi.shareAppMessage || noop,
                 setPreferredFramesPerSecond: miniApi.setPreferredFramesPerSecond || noop,
                 onTouchStart: miniApi.onTouchStart || function (cb) { canvas.addEventListener('touchstart', cb, { passive: false }); },
                 onTouchMove: miniApi.onTouchMove || function (cb) { canvas.addEventListener('touchmove', cb, { passive: false }); },
