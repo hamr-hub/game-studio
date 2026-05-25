@@ -431,9 +431,46 @@ class WebGameActivity : AppCompatActivity() {
               window.KSWebAssembly = window.KSWebAssembly || window.WebAssembly;
               window.WXWebAssembly = window.WXWebAssembly || window.WebAssembly;
 
+              function cocosBundleAlias(path) {
+                var match = path.match(/^src\/(?:scripts|bundle-scripts)\/([^\/]+)(?:\/index\.js)?${'$'}/);
+                return match ? 'assets/' + match[1] + '/index.js' : null;
+              }
+              function cocosModuleCandidates(path) {
+                var candidates = [path];
+                var alias = cocosBundleAlias(path);
+                if (alias && alias !== path) candidates.push(alias);
+                return candidates;
+              }
+              function wrapCocosRequire(fn) {
+                if (!fn || fn.__webSandboxWrappedCocosRequire) return fn;
+                var wrapped = function (moduleName) {
+                  var candidates = cocosModuleCandidates(moduleName);
+                  var lastError = null;
+                  for (var i = 0; i < candidates.length; i++) {
+                    try {
+                      return fn.call(this, candidates[i]);
+                    } catch (e) {
+                      lastError = e;
+                      if (!e || !/cannot find module|Cannot load module/i.test(String(e.message || e))) throw e;
+                    }
+                  }
+                  throw lastError;
+                };
+                wrapped.__webSandboxWrappedCocosRequire = true;
+                return wrapped;
+              }
               function syncGameGlobalToWindow() {
+                var virtualWindow = gameGlobal.window && gameGlobal.window !== gameGlobal ? gameGlobal.window : null;
+                if (virtualWindow && virtualWindow.__cocos_require__) {
+                  virtualWindow.__cocos_require__ = wrapCocosRequire(virtualWindow.__cocos_require__);
+                  gameGlobal.__cocos_require__ = virtualWindow.__cocos_require__;
+                }
+                if (gameGlobal.__cocos_require__) {
+                  gameGlobal.__cocos_require__ = wrapCocosRequire(gameGlobal.__cocos_require__);
+                }
                 [
                   '__globalAdapter',
+                  '__cocos_require__',
                   'ks',
                   'wx',
                   'canvas',
@@ -724,7 +761,10 @@ class WebGameActivity : AppCompatActivity() {
                 var path = request;
                 if (path.charAt(0) === '.') path = (parentDir ? parentDir + '/' : '') + path;
                 path = normalize(path);
-                var candidates = [path, path + '.js', path + '.json', path + '/index.js'];
+                var candidates = [];
+                cocosModuleCandidates(path).forEach(function (candidate) {
+                  candidates.push(candidate, candidate + '.js', candidate + '.json', candidate + '/index.js');
+                });
                 for (var i = 0; i < candidates.length; i++) {
                   var url = candidates[i];
                   var text = tryReadText(url);
