@@ -4,6 +4,7 @@
 .gradle/
 build/
 app/build/
+/gradle/wrapper/gradle-wrapper.jar
 
 # Rust/Cargo
 native/target/
@@ -17,3 +18,6 @@ native/Cargo.lock
 
 # OS
 .DS_Store
+
+# Game assets bundled from history
+/app/src/main/assets/games/
