@@ -444,6 +444,19 @@ class WebGameActivity : AppCompatActivity() {
               window.screencanvas = window.screencanvas || canvas;
               window.__webSandboxLoaded = {};
 
+              function describeSandboxError(reason) {
+                if (!reason) return 'unknown error';
+                if (reason.stack) return reason.stack;
+                if (reason.message) return reason.message;
+                try { return JSON.stringify(reason); } catch (e) { return String(reason); }
+              }
+              window.addEventListener('error', function (event) {
+                console.error('[web-sandbox-error] ' + describeSandboxError(event.error || event.message));
+              });
+              window.addEventListener('unhandledrejection', function (event) {
+                console.error('[web-sandbox-rejection] ' + describeSandboxError(event.reason));
+              });
+
               Object.assign(gameGlobal, {
                 window: gameGlobal,
                 GameGlobal: gameGlobal,
