@@ -662,6 +662,28 @@ class WebGameActivity : AppCompatActivity() {
                 ].forEach(function (name) {
                   if (gameGlobal[name] !== undefined) window[name] = gameGlobal[name];
                 });
+                patchCocosAssetManager();
+              }
+
+              function cocosBundleNameAlias(name) {
+                if (typeof name !== 'string') return name;
+                return name.replace(/^Texture\/UIPrefab\//, '');
+              }
+              function patchCocosAssetManager() {
+                var manager = window.cc && window.cc.assetManager;
+                if (!manager || manager.__webSandboxBundleAliasPatched) return;
+                var nativeLoadBundle = manager.loadBundle;
+                var nativeGetBundle = manager.getBundle;
+                if (typeof nativeLoadBundle !== 'function') return;
+                manager.__webSandboxBundleAliasPatched = true;
+                manager.loadBundle = function (name, options, onComplete) {
+                  return nativeLoadBundle.call(this, cocosBundleNameAlias(name), options, onComplete);
+                };
+                if (typeof nativeGetBundle === 'function') {
+                  manager.getBundle = function (name) {
+                    return nativeGetBundle.call(this, cocosBundleNameAlias(name));
+                  };
+                }
               }
 
               function makeWindowPropertyWritable(name, fallback) {
@@ -814,6 +836,14 @@ class WebGameActivity : AppCompatActivity() {
                   try { window[name] = api; } catch (ignored) {}
                 }
               }
+              function uninstallWindowApi(name) {
+                try {
+                  if (Object.prototype.hasOwnProperty.call(window, name)) delete window[name];
+                } catch (e) {}
+                try {
+                  delete Object.getPrototypeOf(window)[name];
+                } catch (e) {}
+              }
               function bindMediaEvent(target, eventName) {
                 return function (cb) {
                   if (cb) target.addEventListener(eventName, cb);
@@ -955,10 +985,22 @@ class WebGameActivity : AppCompatActivity() {
                   var xhr = this;
                   setTimeout(function () {
                     xhr.readyState = 4;
-                    xhr.status = 204;
-                    xhr.statusText = 'No Content';
-                    xhr.response = '';
-                    xhr.responseText = '';
+                    xhr.status = 200;
+                    xhr.statusText = 'OK';
+                    var payload = {
+                      Result: 0,
+                      code: 0,
+                      errCode: 0,
+                      success: true,
+                      UserID: 'web-sandbox',
+                      userId: 'web-sandbox',
+                      openid: 'web-sandbox',
+                      token: 'web-sandbox',
+                      data: {}
+                    };
+                    var text = JSON.stringify(payload);
+                    xhr.response = xhr._responseType === 'json' ? payload : text;
+                    xhr.responseText = text;
                     notifyXhr(xhr, 'readystatechange');
                     notifyXhr(xhr, 'load');
                     notifyXhr(xhr, 'loadend');
@@ -1056,7 +1098,7 @@ class WebGameActivity : AppCompatActivity() {
                   unzip: function (options) { invokeMiniCallback(options.fail, { errMsg: 'unzip is unavailable in web sandbox' }); }
                 };
               }
-              var miniApi = window.ks || window.wx || {};
+              var miniApi = window.wx || {};
               Object.assign(miniApi, {
                 env: miniApi.env || { USER_DATA_PATH: '' },
                 canIUse: miniApi.canIUse || function () { return false; },
@@ -1076,6 +1118,17 @@ class WebGameActivity : AppCompatActivity() {
                 },
                 getLaunchOptionsSync: miniApi.getLaunchOptionsSync || function () { return { scene: 1000, query: {} }; },
                 getLaunchScene: miniApi.getLaunchScene || function () { return '1000'; },
+                updateShareMenu: miniApi.updateShareMenu || function (options) {
+                  options && options.success && options.success({});
+                  options && options.complete && options.complete({});
+                  return asyncOk();
+                },
+                getNetworkType: miniApi.getNetworkType || function (options) {
+                  var payload = { networkType: 'wifi' };
+                  invokeMiniCallback(options && options.success, payload);
+                  invokeMiniCallback(options && options.complete, payload);
+                  return asyncOk(payload);
+                },
                 login: miniApi.login || function (options) {
                   var payload = { code: 'web-sandbox' };
                   invokeMiniCallback(options && options.success, payload);
@@ -1102,6 +1155,7 @@ class WebGameActivity : AppCompatActivity() {
                 onError: noop,
                 offError: miniApi.offError || noop,
                 onMessage: miniApi.onMessage || noop,
+                postMessage: miniApi.postMessage || noop,
                 getOpenDataContext: miniApi.getOpenDataContext || function () { return { postMessage: noop, canvas: canvas }; },
                 getSharedCanvas: miniApi.getSharedCanvas || function () { return canvas; },
                 createCanvas: miniApi.createCanvas || function () { return document.createElement('canvas'); },
@@ -1179,7 +1233,20 @@ class WebGameActivity : AppCompatActivity() {
                   return asyncOk(payload);
                 },
                 request: miniApi.request || function (options) {
-                  var payload = { statusCode: 204, data: {} };
+                  var payload = {
+                    statusCode: 200,
+                    data: {
+                      Result: 0,
+                      code: 0,
+                      errCode: 0,
+                      success: true,
+                      UserID: 'web-sandbox',
+                      userId: 'web-sandbox',
+                      openid: 'web-sandbox',
+                      token: 'web-sandbox',
+                      data: {}
+                    }
+                  };
                   options && options.success && options.success(payload);
                   options && options.complete && options.complete(payload);
                   return asyncOk(payload);
@@ -1271,13 +1338,13 @@ class WebGameActivity : AppCompatActivity() {
                 clearStorageSync: miniApi.clearStorageSync || function () { localStorage.clear(); }
               });
               window.GameGlobal.wx = miniApi;
-              window.GameGlobal.ks = miniApi;
-              window.GameGlobal.tt = miniApi;
-              window.GameGlobal.qg = miniApi;
+              delete window.GameGlobal.ks;
+              delete window.GameGlobal.tt;
+              delete window.GameGlobal.qg;
               installNonOwnWindowApi('wx', miniApi);
-              installNonOwnWindowApi('ks', miniApi);
-              installNonOwnWindowApi('tt', miniApi);
-              installNonOwnWindowApi('qg', miniApi);
+              uninstallWindowApi('ks');
+              uninstallWindowApi('tt');
+              uninstallWindowApi('qg');
               syncGameGlobalToWindow();
 
               var moduleCache = {};
