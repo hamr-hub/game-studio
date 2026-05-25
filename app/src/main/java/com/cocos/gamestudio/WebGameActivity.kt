@@ -218,6 +218,7 @@ class WebGameActivity : AppCompatActivity() {
     private fun finalizePreparedSandbox(root: File): File {
         createCocosAssetAliases(root)
         createRemoteBundleAliases(root)
+        createSubpackageAliases(root)
         return root
     }
 
@@ -271,6 +272,34 @@ class WebGameActivity : AppCompatActivity() {
                     Log.w(
                         TAG,
                         "Unable to create remote bundle alias ${target.name}",
+                        copyError,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun createSubpackageAliases(root: File) {
+        val subpackagesRoot = File(root, "subpackages")
+        if (!subpackagesRoot.isDirectory) {
+            return
+        }
+
+        subpackagesRoot.listFiles { file -> file.isDirectory }?.forEach { source ->
+            val target = File(root, source.name)
+            if (target.exists()) {
+                return@forEach
+            }
+
+            try {
+                Os.symlink(source.absolutePath, target.absolutePath)
+            } catch (_: Exception) {
+                try {
+                    source.copyRecursively(target, overwrite = false)
+                } catch (copyError: Exception) {
+                    Log.w(
+                        TAG,
+                        "Unable to create Cocos subpackage alias ${target.name}",
                         copyError,
                     )
                 }
