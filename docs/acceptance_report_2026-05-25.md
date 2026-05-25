@@ -1,12 +1,12 @@
 # 验收检测报告（填报）
 
-- 报告时间：2026-05-25 14:12:03 +0800
+- 报告时间：2026-05-25 13:07:16 +0800
 - 验收人：Game Studio 开发协作流程
 - 设备：Google/OnePlus（`R5CR70SRPSD`）
-- CI run-id：debug `26383118168` / release `26383116633`
-- build 类型：debug（本次真机安装）；release 已触发并验证通过（未用于本次现场回归）
+- CI run-id：待本轮 web sandbox 修复推送后回填
+- build 类型：待本轮 debug 真机安装；release 待 CI 验证
 - ABI：arm64-v8a
-- 版本/分支：`main`（提交 `f4caa5c`）
+- 版本/分支：`main`（本轮修复提交待回填）
 
 ## 1. 测试环境
 - 机器/系统：Android + GitHub Actions artifact + 本地 adb
@@ -18,19 +18,29 @@
 
 | 功能 | 结果 | 证据 |
 |---|---|---|
-| 零拷贝资源路径（`assets://`） | 部分通过 | 已使用 CI 新包安装后，启动时不再出现 `Cannot prepare web sandbox for assets:/games/...` 的历史错误；Web 启动链路进入 `WebGameActivity`，并展示 `android.webkit.WebView` + `GameCanvas`。
+| 零拷贝资源路径（`assets://`） | 待回归 | 本轮继续沿用 `assets://games/*.zip` 路径。修复点不改变原生 VFS 协议，只修复 Web 回退沙箱与内置包完整性。
 | 启动性能与入口识别 | 未完成 | 本次未执行脚本化启动耗时统计；仅做页面可启动观察。
 | FPS/帧耗时显示 | 未完成 | 未在本次回归专门验证。
 | 控制台过滤器 | 未完成 | 未在本次回归专门验证。
 | 设置页生效 | 未完成 | 未在本次回归专门验证。
 | 截图与相册 | 未完成 | 未在本次回归专门验证。
-| CI-only 打包安装 | 通过 | 按流程执行：`gh workflow run "Android Debug APK"` / `gh workflow run "Android Release APK"`，并通过 `./scripts/fetch_ci_debug_apk.sh --type=debug --abi=arm64-v8a --serial=R5CR70SRPSD --run-id=26382778922` 成功安装（`INSTALL_SUCCESS`）。
-| 真机功能链路 | 通过 | 安装后成功启动列表页并点击示例游戏进入 `GameActivity`，日志不再出现 `assets:/` 沙箱准备失败的关键匹配。
-| 内建游戏 `assets://games/*.zip` 逐项启动 | 部分通过 | 使用 `adb am start -n com.cocos.gamestudio/.GameActivity -e GAME_PATH assets://games/<file>.zip` 脚本化验证 14 个包。`WebGameActivity` 启动且出现 `android.webkit.WebView` 的有 11 个。失败 3 个原因如下：1) `1000015_1.1.4.zip`、2) `1000019_0.0.3.zip`、3) `1000024_2303.06.1630.zip` 解压/签名校验异常（`End-of-central-directory signature not found`），疑似损坏归档；4) `1000031_1.0.0.zip` 本体正常，可正常进入 `WebGameActivity` 并加载到 `WebView`。
+| CI-only 打包安装 | 待回归 | 本轮仍只允许通过 GitHub Actions 打包和 `scripts/fetch_ci_debug_apk.sh` 下载安装，不执行本地 `assemble*`。
+| 真机功能链路 | 待回归 | 待本轮 CI debug APK 安装后重新启动列表页、详情页和游戏页。
+| 内建游戏 `assets://games/*.zip` 逐项启动 | 待回归 | 本轮已定位 3 个失败包是仓库内置 ZIP 截断：`1000015_1.1.4.zip`、`1000019_0.0.3.zip`、`1000024_2303.06.1630.zip`。已替换为 `/mnt/ssd/codespace/kwai-game/package-downloader/last/` 中通过 `unzip -t` 的完整包，并加固 Web 沙箱启动器。CI 真机验证目标为 14/14 可进入 `WebGameActivity` 且不出现沙箱准备失败。
 
 ## 3. 备注
-- 当前变更目标主要是 `assets://` 归一化（含 `assets://`、`assets:/`、`/assets://`、`/assets:/` 兼容）与路径传递链路修复。
-- 未覆盖项记录：
-  - 全量 14 款内置游戏逐一验证。
-  - FPS、控制台、设置、截图链路的深入核验。
-- assets 回退记录说明：本次记录未见 `STARTED_SIMULATED` 的降级触发日志；原生返回 `STARTED`/回退分支需在下一轮日志链路用例中补齐。
+- 当前变更目标从单纯 `assets://` 归一化扩大为 Web 回退沙箱可运行性：
+  - 替换 3 个截断内置包，所有 `app/src/main/assets/games/*.zip` 已通过本地 `unzip -t`。
+  - `WebGameActivity` 增加沙箱完整性标记 `.web-sandbox-ready`，避免半成品缓存被复用。
+  - 沙箱缓存 key 纳入 asset/file 大小，包内容更新后会重新解包。
+  - 启动 HTML 改为注入 CommonJS `require`、`ks/wx` 基础桩和 `GameCanvas`，用于运行 Kwai/Cocos mini-game 包。
+  - WebView console 已接入 Android logcat，便于真机定位 JS 运行错误。
+- 本轮本地校验（未编译 APK）：
+  - `git diff --check`：通过。
+  - `unzip -t app/src/main/assets/games/*.zip`：14/14 通过。
+  - `zipinfo -1 app/src/main/assets/games/*.zip | rg '^game\.js$'`：14/14 均包含 root `game.js`。
+- 待 CI/真机回填：
+  - debug/release workflow run-id。
+  - debug arm64-v8a artifact 安装结果。
+  - 14 个 `assets://games/*.zip` 的 clean data 逐项启动结果。
+  - `STARTED`/`STARTED_SIMULATED`/Web 回退日志证据。

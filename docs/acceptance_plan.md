@@ -14,7 +14,8 @@
 | 零拷贝游戏资源接入 | 支持 `assets://games/*.zip` 直接由 Native 侧读取，不必先解压到本地 | 1) APK 内置带 `games/` 目录 zip；2) 启动游戏时传入 `assets://...` 路径；3) Native 日志输出 `Game path resolved from AssetManager` | 原生初始化不再拒绝 `assets://`，`nativeGetPackageSummary` 与启动状态可展示包元信息 |
 | 原生初始化与启动状态 | Native 能返回可观测状态并驱动 App 回退策略 | 1) 在 `GameActivity` 启动后读取 `nativeGetBootstrapStatus`；2) 对 `STARTED`/`STARTED_SIMULATED`/异常码执行不同分支 | `STARTED` 进入原生渲染；其他状态触发 Web 回退 |
 | 启动性能与入口识别 | `assets://` 包扫描与入口检测稳定通过 | 1) 检查 `nativeGetPackageSummary` 和日志中是否包含 `analyzed` 信息；2) 检查 main entry 候选与入口语义判定字段 | 游戏包在启动时能识别到 `main_entry`，并给出 bootstrap 状态 |
-| FPS 与帧耗时 | 左上角实时显示性能指标 | 进入游戏 > 1 秒后读取左上角文字与更新频率 | 每 1s 更新一次指标，包含 FPS/帳耗时 |
+| Web 回退沙箱 | 原生不可完整运行时，WebView 能解包并启动每个内置小游戏 | 1) clean app data；2) 逐项以 `adb am start ... -e GAME_PATH assets://games/<zip>` 启动 14 个内置包；3) 检查 `WebGameActivity`、`GameCanvas`、console 日志和触摸响应 | 14/14 包进入 Web 沙箱；不出现 `Cannot prepare web sandbox`、`ReferenceError: require is not defined` 或损坏 ZIP 解包失败 |
+| FPS 与帧耗时 | 左上角实时显示性能指标 | 进入游戏 > 1 秒后读取左上角文字与更新频率 | 每 1s 更新一次指标，包含 FPS/帧耗时 |
 | 原生日志控制台 | 支持查看并按级别过滤日志 | 1) 打开 console 面板；2) 切换 ALL/INFO/WARN/ERROR | 控制台可显示并按颜色/过滤器区分日志 |
 | 设置透传与生效 | 设置页修改 FPS 并影响游戏运行 | 1) 在 Settings 修改 FPS；2) 回到运行页观察指标变化 | 游戏统计中的 FPS 变化与设置一致 |
 | 截图与相册链路 | 支持游戏内截图并在系统相册可见 | 1) 点击拍照按钮；2) 回到 Profile/My Captures 查看 | 截图可保存到图库并展示 |
@@ -24,11 +25,11 @@
 ## 最近执行记录
 
 - 执行人：`game-studio` 当前流程负责人
-- 最后更新：2026-05-25
-- 主分支提交：`f4caa5c`
+- 最后更新：2026-05-25 13:07 +0800
+- 主分支提交：待本轮 web sandbox 修复提交后回填
 - CI 参考：
-  - debug: `26382778922`
-  - release: `26382780147`
+  - debug: 待本轮 GitHub Actions 回填
+  - release: 待本轮 GitHub Actions 回填
 
 ## 交付要求
 - 产出：
