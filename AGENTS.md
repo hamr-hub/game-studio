@@ -149,3 +149,7 @@ The Game Studio project has been optimized with several advanced features:
 - 任何 `assets://` 游戏路径变更须在验收报告记录：
   - 原生是否返回 `STARTED`，
   - 是否成功触发回退分支（如为 `STARTED_SIMULATED`）。
+
+## 最近执行更新
+
+- 2026-05-25：完成 `assets://` 路径归一化修复后的 CI 真机验收记录，新增 `docs/acceptance_report_2026-05-25.md`，并将 `docs/acceptance_plan.md` 生效时间更新到当前版本日期。

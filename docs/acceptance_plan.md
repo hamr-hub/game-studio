@@ -2,7 +2,7 @@
 
 ## 版本
 - 计划版本：v1.0
-- 生效时间：2026-05-22
+- 生效时间：2026-05-25
 - 来源：
   - `AGENTS.md`
   - `docs/engine_app_native_contract.md`
@@ -20,6 +20,15 @@
 | 截图与相册链路 | 支持游戏内截图并在系统相册可见 | 1) 点击拍照按钮；2) 回到 Profile/My Captures 查看 | 截图可保存到图库并展示 |
 | CI 首次打包与下载 | 不在本机执行本地编译，只走 GitHub Actions artifact | 1) 推送触发 `Android Debug APK` 或 `Android Release APK`；2) `scripts/fetch_ci_debug_apk.sh` 自动下载安装 | 成功下载并安装 `game-studio-<type>-arm64-v8a-apk` 到已连接设备 |
 | 真机回归 | 真机已授权设备上可运行并进入核心功能 | 1) 安装完成后启动 `com.cocos.gamestudio/.GameListActivity`；2) 启动游戏并完成关键流程 | 列表展示、详情弹窗、启动体验、回退链路、日志与截图均可用 |
+
+## 最近执行记录
+
+- 执行人：`game-studio` 当前流程负责人
+- 最后更新：2026-05-25
+- 主分支提交：`d4b4b3b`
+- CI 参考：
+  - debug: `26382778922`
+  - release: `26382780147`
 
 ## 交付要求
 - 产出：
