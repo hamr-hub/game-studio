@@ -791,9 +791,27 @@ class WebGameActivity : AppCompatActivity() {
                 createInnerAudioContext: miniApi.createInnerAudioContext || function () {
                   var audio = new Audio();
                   audio.destroy = function () { audio.pause(); audio.src = ''; };
-                  audio.onEnded = function (cb) { audio.addEventListener('ended', cb); };
-                  audio.offEnded = function (cb) { audio.removeEventListener('ended', cb); };
-                  audio.seek = function (time) { audio.currentTime = time || 0; };
+                  audio.onPlay = bindMediaEvent(audio, 'play');
+                  audio.offPlay = unbindMediaEvent(audio, 'play');
+                  audio.onPause = bindMediaEvent(audio, 'pause');
+                  audio.offPause = unbindMediaEvent(audio, 'pause');
+                  audio.onStop = bindMediaEvent(audio, 'stop');
+                  audio.offStop = unbindMediaEvent(audio, 'stop');
+                  audio.onSeeked = bindMediaEvent(audio, 'seeked');
+                  audio.offSeeked = unbindMediaEvent(audio, 'seeked');
+                  audio.onEnded = bindMediaEvent(audio, 'ended');
+                  audio.offEnded = unbindMediaEvent(audio, 'ended');
+                  audio.onCanplay = bindMediaEvent(audio, 'canplay');
+                  audio.offCanplay = unbindMediaEvent(audio, 'canplay');
+                  audio.onError = bindMediaEvent(audio, 'error');
+                  audio.offError = unbindMediaEvent(audio, 'error');
+                  audio.stop = function () {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    audio.dispatchEvent(new Event('stop'));
+                    return asyncOk();
+                  };
+                  audio.seek = function (time) { audio.currentTime = time || 0; return asyncOk(); };
                   return audio;
                 },
                 createVideo: miniApi.createVideo || function () {
