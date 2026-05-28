@@ -85,7 +85,7 @@ class GameListFragment : Fragment() {
         iconIv.contentDescription = getString(R.string.game_icon_description, game.displayName)
         GameIconLoader.bind(iconIv, iconTv, game)
         nameTv.text = game.displayName
-        sizeTv.text = formatSize(game.sizeBytes)
+        sizeTv.text = GameSizeFormatter.format(requireContext(), game.sizeBytes)
         descTv.text = game.description
         playBtn.contentDescription = getString(R.string.launch_game_named, game.displayName)
 
@@ -108,14 +108,6 @@ class GameListFragment : Fragment() {
             putExtra(GameActivity.EXTRA_GAME_ORIENTATION, game.orientation)
         }
         startActivity(intent)
-    }
-
-    private fun formatSize(bytes: Long): String {
-        if (bytes < 1024) return "$bytes B"
-        val kb = bytes / 1024
-        if (kb < 1024) return "$kb KB"
-        val mb = kb / 1024
-        return String.format("%.1f MB", mb.toFloat())
     }
 
     private fun setupSearch() {

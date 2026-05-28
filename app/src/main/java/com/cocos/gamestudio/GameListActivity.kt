@@ -121,7 +121,7 @@ class GameListActivity : AppCompatActivity() {
             holder.iconView.contentDescription = context.getString(R.string.game_icon_description, game.displayName)
             holder.iconImageView.contentDescription = context.getString(R.string.game_icon_description, game.displayName)
             GameIconLoader.bind(holder.iconImageView, holder.iconView, game)
-            holder.sizeView.text = formatSize(game.sizeBytes)
+            holder.sizeView.text = GameSizeFormatter.format(context, game.sizeBytes)
             holder.view.contentDescription = context.getString(
                 R.string.game_card_description,
                 game.displayName,
@@ -131,13 +131,5 @@ class GameListActivity : AppCompatActivity() {
         }
 
         override fun getItemCount() = filteredGames.size
-
-        private fun formatSize(bytes: Long): String {
-            if (bytes < 1024) return "$bytes B"
-            val kb = bytes / 1024
-            if (kb < 1024) return "$kb KB"
-            val mb = kb / 1024
-            return String.format("%.1f MB", mb.toFloat())
-        }
     }
 }

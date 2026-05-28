@@ -8,6 +8,7 @@
     <string name="game_catalog_subtitle">Ready-to-play Cocos packages</string>
     <string name="games_available">%1$d games available</string>
     <string name="games_matching">%1$d games matching "%2$s"</string>
+    <string name="game_size_unavailable">Size unavailable</string>
     <string name="no_games_found">No games found</string>
     <string name="no_games_found_detail">Try another keyword or refresh the distribution config.</string>
     <string name="recent_games">Recently Played</string>

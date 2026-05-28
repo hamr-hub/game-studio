@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.Log
 import java.io.File
 import java.io.IOException
+import java.util.Locale
+import java.util.zip.ZipFile
 
 data class GameEntry(
     val id: String,
@@ -123,12 +125,7 @@ object GameCatalog {
             file.name
         }
         val size = if (path.startsWith("assets://") && context != null) {
-            try {
-                val assetPath = path.removePrefix("assets://").trimStart('/')
-                context.assets.open(assetPath).use { it.available().toLong() }
-            } catch (_: Exception) {
-                0L
-            }
+            resolveAssetSize(context, path.removePrefix("assets://").trimStart('/'))
         } else {
             file.length()
         }
@@ -190,6 +187,65 @@ object GameCatalog {
         } catch (_: Exception) {
             null
         }
+    }
+
+    private fun resolveAssetSize(context: Context, assetPath: String): Long {
+        try {
+            context.assets.openFd(assetPath).use { descriptor ->
+                if (descriptor.length >= 0L) return descriptor.length
+            }
+        } catch (_: IOException) {
+            // Compressed APK assets cannot be opened as file descriptors.
+        } catch (_: RuntimeException) {
+            // Keep catalog loading resilient if a device asset manager behaves differently.
+        }
+
+        val apkEntryPath = "assets/$assetPath"
+        val sourceDirs = mutableListOf<String>()
+        context.applicationInfo.sourceDir?.let { sourceDirs.add(it) }
+        context.applicationInfo.splitSourceDirs?.forEach { sourceDirs.add(it) }
+        sourceDirs.forEach { sourceDir ->
+            try {
+                ZipFile(sourceDir).use { apk ->
+                    val size = apk.getEntry(apkEntryPath)?.size ?: -1L
+                    if (size >= 0L) return size
+                }
+            } catch (_: IOException) {
+                // Try the next source dir, then fall back to counting the stream.
+            } catch (_: RuntimeException) {
+                // Ignore malformed or inaccessible split sources.
+            }
+        }
+
+        return try {
+            context.assets.open(assetPath).use { input ->
+                val buffer = ByteArray(16 * 1024)
+                var total = 0L
+                while (true) {
+                    val read = input.read(buffer)
+                    if (read < 0) break
+                    total += read.toLong()
+                }
+                total
+            }
+        } catch (e: IOException) {
+            Log.w(TAG, "Failed to measure asset size for $assetPath", e)
+            0L
+        } catch (e: RuntimeException) {
+            Log.w(TAG, "Failed to measure asset size for $assetPath", e)
+            0L
+        }
+    }
+}
+
+object GameSizeFormatter {
+    fun format(context: Context, bytes: Long): String {
+        if (bytes <= 0L) return context.getString(R.string.game_size_unavailable)
+        if (bytes < 1024L) return "$bytes B"
+        val kb = bytes / 1024L
+        if (kb < 1024L) return "$kb KB"
+        val mb = bytes / (1024f * 1024f)
+        return String.format(Locale.getDefault(), "%.1f MB", mb)
     }
 }
 
