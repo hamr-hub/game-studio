@@ -116,8 +116,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="@string/settings_fps_30"
-                                app:checkable="true" />
+                                android:text="@string/settings_fps_30" />
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/fps_60_btn"
@@ -125,8 +124,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="@string/settings_fps_60"
-                                app:checkable="true" />
+                                android:text="@string/settings_fps_60" />
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/fps_90_btn"
@@ -134,8 +132,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="@string/settings_fps_90"
-                                app:checkable="true" />
+                                android:text="@string/settings_fps_90" />
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/fps_120_btn"
@@ -143,8 +140,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="@string/settings_fps_120"
-                                app:checkable="true" />
+                                android:text="@string/settings_fps_120" />
                         </com.google.android.material.button.MaterialButtonToggleGroup>
                     </LinearLayout>
 
