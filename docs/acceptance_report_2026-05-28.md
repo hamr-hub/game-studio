@@ -1,10 +1,10 @@
 # 视觉一致性与交互反馈验收报告
 
-- 报告时间：2026-05-28 17:07:28 +0800
+- 报告时间：2026-05-28 17:53:08 +0800
 - 验收人：Game Studio 开发协作流程
 - 设备状态：Samsung `SM-G9910`（`R5CR70SRPSD`）已通过 `adb devices -l` 检测为 `device`
 - 安装来源约束：本轮未执行本地 `assemble*`，真机安装仍要求使用 GitHub Actions artifact
-- 本轮性质：视觉资源、主界面 UI 一致性、基础交互反馈、Profile 激励体系、鲜艳 Launcher 图标、游戏内横竖屏锁定与 CI artifact 通道验证
+- 本轮性质：视觉资源、主界面 UI 一致性、基础交互反馈、Profile 激励体系、鲜艳 Launcher 图标、Settings 控件打磨、游戏内横竖屏锁定与 CI artifact 通道验证
 
 ## 1. 本轮改造范围
 
@@ -15,7 +15,8 @@
 | 游戏列表 | 已完成静态落地 | 搜索框、结果计数、加载状态、空状态、两/三列自适应网格、统一卡片高度和图片兜底已接入。 |
 | 游戏详情弹层 | 已完成静态落地 | 统一圆角图标容器、标题/说明样式、主按钮样式和启动 Snackbar 反馈。 |
 | Profile | 已完成静态落地 | 头像、统计块、最近游戏空态、截图空态和截图读屏描述已接入，移除系统默认图标混搭。 |
-| Settings | 已完成静态落地 | 统一 Toolbar、卡片、Spinner 外观、Switch 文本样式；FPS/开关修改后 Snackbar + accessibility announce。 |
+| Settings | 已完成静态落地 | 统一 Toolbar、卡片、分段按钮和 Switch 文本样式；FPS/开关修改后 Snackbar + accessibility announce。 |
+| Settings 控件二次改造 | 已完成真机回归 | 移除系统 `Spinner`，改为 30/60/90/120 分段按钮；FPS、Shadows、Vulkan 均改为图标 + 标题 + 描述 + 明确控件，开关整行可点。 |
 | CI artifact 通道 | 已修复配置 | `android-debug.yml` 与 `android-release.yml` 在打包前执行 `scripts/bootstrap_gradle.sh`；同步修复 Gradle 9.4.1 wrapper main/shared/cli/files jar 拆分问题。 |
 | 内置游戏资源 | 已恢复 | 真机首轮安装显示 `0 games available`，取证发现当前 HEAD 缺失历史内置 `assets/games/*.zip`；已从历史成功提交 `3007de0` 恢复 14 个内置包，目录约 71 MB。 |
 | App 图标体系 | 已完成静态落地 | adaptive foreground 改为游戏手柄/徽章组合，mdpi 到 xxxhdpi legacy 与 round PNG 已重新生成并校验尺寸。 |
@@ -44,6 +45,8 @@
 | 本轮真机安装 | 通过 | 设备 `R5CR70SRPSD` 上旧包因签名不一致无法覆盖安装，已卸载旧包后安装本轮 CI artifact 并启动 `com.cocos.gamestudio/.GameListActivity`。 |
 | 图标与横竖屏 CI debug | 通过 | run `26564442336`（提交 `01eb61e`）arm64-v8a 与 x86_64 均成功。arm64 artifact `7261582557`，zip 大小 `79433468`，`unzip -t` 通过，解出 `/tmp/game-studio-ci-apk-01eb61e/app-debug.apk`。 |
 | 图标与横竖屏真机安装 | 通过 | 旧 debug 包签名不一致，已卸载 `com.cocos.gamestudio` 后安装 run `26564442336` arm64 artifact；`dumpsys package` 显示安装时间 `2026-05-28 16:59:58`。 |
+| Settings 控件资源编译 | 通过 | run `26565860036` 曾因 `activity_settings.xml` 中 `app:checkable` 非法属性失败；提交 `372861e` 移除该属性后，run `26566114726` arm64-v8a 与 x86_64 均成功。 |
+| Settings 控件真机安装 | 通过 | run `26566114726`（提交 `372861e`）arm64 artifact `7262288845`，zip 大小 `79436119`，`unzip -t` 通过，解出 `/tmp/game-studio-ci-apk-372861e/app-debug.apk`；签名不一致时已卸载旧包后安装并启动。 |
 
 ## 3. Profile 激励体系真机回归
 
@@ -68,7 +71,17 @@
 | 游戏外恢复方向 | 通过 | 启动 `GameListActivity` 后，`mCurrentAppOrientation=SCREEN_ORIENTATION_FULL_USER`，截图尺寸 `1080 x 2400`；截图 `/tmp/game-studio-01eb61e-list.png`。 |
 | 内置游戏方向配置说明 | 通过 | 当前 `game_distribution.json` 和内置包 `game.json` 均声明竖屏，因此从列表点击内置游戏会按配置竖屏；横屏游戏需由远端/分发配置或启动参数声明 `landscape`。 |
 
-## 5. 未完成/待真机回归
+## 5. Settings 控件真机回归
+
+| 场景 | 结果 | 证据 |
+|---|---|---|
+| Settings 首屏视觉 | 通过 | 真机截图 `/tmp/gs-372861e-settings.png` 显示分段 FPS 控件、图标化设置项、统一卡片间距和隐藏滚动条；未出现系统 `Spinner`。 |
+| FPS 分段按钮反馈 | 通过 | 点击 `90` 后 UI dump 显示 `fps_90_btn checked="true"`，页面出现 `FPS limit set to 90` Snackbar；截图 `/tmp/gs-372861e-settings-fps90.png`。 |
+| Shadows 整行点击反馈 | 通过 | 点击 Shadows 行后 UI dump 显示 `shadows_switch checked="false"`，页面出现 `Shadows disabled` Snackbar；截图 `/tmp/gs-372861e-settings-shadows-toggle.png`。 |
+| 游戏外方向恢复 | 通过 | Settings 页 `dumpsys window` 显示 `SettingsActivity` 且 `mCurrentAppOrientation=SCREEN_ORIENTATION_FULL_USER`，说明该页不继承游戏内横竖屏锁定。 |
+| Profile 权限弹窗 | 通过 | 重新安装后首次进入 Profile 触发系统媒体权限弹窗，已在真机授权后继续验证；该弹窗为 Android 权限流程，不属于 UI 资源识别异常。 |
+
+## 6. 未完成/待真机回归
 
 | 项目 | 当前状态 | 后续验收方式 |
 |---|---|---|
@@ -77,7 +90,7 @@
 | 字号放大与 TalkBack | 待真机专项 | 真机开启字体放大和 TalkBack，检查卡片、按钮、设置项、截图项读屏顺序。 |
 | Release 安装验证 | 待 CI artifact | `Android Release APK` 成功后下载安装 `game-studio-release-arm64-v8a-apk`。 |
 
-## 6. 风险记录
+## 7. 风险记录
 
 - 本轮未在本地生成 APK，遵守 CI-only 安装约束。
 - `gh run download` 在本机下载大 artifact 时长时间无落盘；最终改用同一 artifact 的 Range 请求分段下载并校验 zip 大小与 `unzip -t`。
