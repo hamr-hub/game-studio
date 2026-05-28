@@ -5,6 +5,8 @@
 build/
 app/build/
 /gradle/wrapper/gradle-wrapper.jar
+/gradle/wrapper/gradle-wrapper-shared.jar
+/gradle/wrapper/gradle-cli.jar
 
 # Rust/Cargo
 native/target/

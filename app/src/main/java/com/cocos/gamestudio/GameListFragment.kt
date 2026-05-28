@@ -7,15 +7,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
 class GameListFragment : Fragment() {
@@ -23,8 +24,12 @@ class GameListFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewAdapter: GameListActivity.GameAdapter
     private lateinit var viewManager: GridLayoutManager
-    private lateinit var progressBar: ProgressBar
+    private lateinit var loadingContainer: View
+    private lateinit var emptyStateContainer: View
+    private lateinit var resultsStatusTv: TextView
     private lateinit var searchView: SearchView
+    private var currentQuery: String = ""
+    private var allGameCount: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,11 +37,14 @@ class GameListFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_game_list, container, false)
 
-        progressBar = view.findViewById(R.id.loading_pb)
+        loadingContainer = view.findViewById(R.id.loading_container)
+        emptyStateContainer = view.findViewById(R.id.empty_state_container)
+        resultsStatusTv = view.findViewById(R.id.results_status_tv)
         searchView = view.findViewById(R.id.search_view)
         recyclerView = view.findViewById(R.id.game_list_rv)
 
-        viewManager = GridLayoutManager(context, 2)
+        val spanCount = if (resources.configuration.screenWidthDp >= 600) 3 else 2
+        viewManager = GridLayoutManager(context, spanCount)
         viewAdapter = GameListActivity.GameAdapter(emptyList()) { game ->
             showGameDetail(game)
         }
@@ -64,18 +72,28 @@ class GameListFragment : Fragment() {
         val descTv = bottomSheetView.findViewById<TextView>(R.id.detail_desc_tv)
         val playBtn = bottomSheetView.findViewById<MaterialButton>(R.id.play_button)
 
+        bottomSheetView.contentDescription = getString(R.string.game_detail_description, game.displayName)
         iconTv.text = game.iconLabel
         val bg = GradientDrawable().apply {
-            shape = GradientDrawable.OVAL
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = resources.getDimension(R.dimen.game_icon_corner)
             setColor(game.iconColor)
+            setStroke(1, ContextCompat.getColor(requireContext(), R.color.surface))
         }
         iconTv.background = bg
+        iconTv.contentDescription = getString(R.string.game_icon_description, game.displayName)
+        iconIv.contentDescription = getString(R.string.game_icon_description, game.displayName)
         GameIconLoader.bind(iconIv, iconTv, game)
         nameTv.text = game.displayName
         sizeTv.text = formatSize(game.sizeBytes)
         descTv.text = game.description
+        playBtn.contentDescription = getString(R.string.launch_game_named, game.displayName)
 
         playBtn.setOnClickListener {
+            playBtn.isEnabled = false
+            playBtn.text = getString(R.string.launching_game)
+            playBtn.contentDescription = getString(R.string.launching_named, game.displayName)
+            Snackbar.make(requireView(), getString(R.string.launching_named, game.displayName), Snackbar.LENGTH_SHORT).show()
             dialog.dismiss()
             launchGame(game)
         }
@@ -103,23 +121,46 @@ class GameListFragment : Fragment() {
     private fun setupSearch() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                viewAdapter.filter(query ?: "")
+                currentQuery = query.orEmpty()
+                val count = viewAdapter.filter(currentQuery)
+                updateCatalogState(count)
+                searchView.clearFocus()
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                viewAdapter.filter(newText ?: "")
+                currentQuery = newText.orEmpty()
+                val count = viewAdapter.filter(currentQuery)
+                updateCatalogState(count)
                 return true
             }
         })
     }
 
     private fun loadGames() {
-        progressBar.visibility = View.VISIBLE
+        loadingContainer.visibility = View.VISIBLE
+        emptyStateContainer.visibility = View.GONE
+        recyclerView.visibility = View.INVISIBLE
+        resultsStatusTv.text = getString(R.string.loading_games)
         lifecycleScope.launch {
             val gameEntries = GameCatalog.listGames(requireContext())
+            allGameCount = gameEntries.size
             viewAdapter.updateData(gameEntries)
-            progressBar.visibility = View.GONE
+            loadingContainer.visibility = View.GONE
+            recyclerView.visibility = View.VISIBLE
+            updateCatalogState(viewAdapter.filteredCount())
         }
+    }
+
+    private fun updateCatalogState(visibleCount: Int) {
+        val query = currentQuery.trim()
+        resultsStatusTv.text = if (query.isEmpty()) {
+            getString(R.string.games_available, allGameCount)
+        } else {
+            getString(R.string.games_matching, visibleCount, query)
+        }
+        val isEmpty = visibleCount == 0 && loadingContainer.visibility != View.VISIBLE
+        emptyStateContainer.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        recyclerView.visibility = if (isEmpty) View.GONE else View.VISIBLE
     }
 }

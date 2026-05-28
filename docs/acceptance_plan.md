@@ -2,7 +2,7 @@
 
 ## 版本
 - 计划版本：v1.0
-- 生效时间：2026-05-25
+- 生效时间：2026-05-28
 - 来源：
   - `AGENTS.md`
   - `docs/engine_app_native_contract.md`
@@ -16,6 +16,9 @@
 | 启动性能与入口识别 | `assets://` 包扫描与入口检测稳定通过 | 1) 检查 `nativeGetPackageSummary` 和日志中是否包含 `analyzed` 信息；2) 检查 main entry 候选与入口语义判定字段 | 游戏包在启动时能识别到 `main_entry`，并给出 bootstrap 状态 |
 | Web 回退沙箱 | 原生不可完整运行时，WebView 能解包并启动每个内置小游戏 | 1) clean app data；2) 逐项以 `adb am start ... -e GAME_PATH assets://games/<zip>` 启动 14 个内置包；3) 检查 `WebGameActivity`、`GameCanvas`、console 日志和触摸响应 | 14/14 包进入 Web 沙箱；不出现 `Cannot prepare web sandbox`、`ReferenceError: require is not defined` 或损坏 ZIP 解包失败 |
 | 游戏列表分发策略 | 支持服务端通过 `tailNumber` 开关、显隐字段、排序、展示元数据和横竖屏控制列表动态渲染 | 1) 使用内置 `game_distribution.json` 启动列表；2) 配置远端 JSON 后重新进入列表；3) 验证 `tailNumber`、`visible`/`hidden`、`order`、`displayName`、`description`、`icon`、`orientation` 生效 | 尾号不匹配或被屏蔽游戏不展示且不出现在最近游戏；排序与配置一致；列表卡片和详情弹层展示配置名称、说明和图标；启动游戏后方向与配置一致 |
+| 视觉一致性与 UI 资源 | 全 App 使用统一颜色、字体层级、间距、圆角、图标风格和图片兜底资源 | 1) 检查 `colors.xml`/`dimens.xml`/`styles.xml` 是否覆盖主界面；2) 检查底部导航、搜索、卡片、详情弹层、Profile、Settings 是否引用统一 token；3) 真机截图比对列表、详情、Profile、Settings | 不出现系统默认图标混搭、硬编码主界面颜色、图片失败空白、明显不对称卡片或突兀控件 |
+| 交互反馈与当前位置 | 任何用户操作有即时反馈，用户能知道当前位置和下一步动作 | 1) 切换底部导航；2) 搜索并清空关键词；3) 打开详情并点击启动；4) 修改 Settings 开关和 FPS | Toolbar 标题跟随页面；搜索结果数/空态实时更新；启动和设置变更有 Snackbar/文字状态反馈；列表空态可理解 |
+| 基础无障碍 | 文字对比度、字号伸缩和读屏基础语义可用 | 1) 检查主文本颜色对比；2) 打开系统字体放大；3) TalkBack 聚焦导航、游戏卡片、启动按钮、设置项、截图项 | 主文本不使用低对比浅灰；关键图片/卡片/按钮有可读描述；装饰图不重复播报；48dp 触控目标基本满足 |
 | FPS 与帧耗时 | 左上角实时显示性能指标 | 进入游戏 > 1 秒后读取左上角文字与更新频率 | 每 1s 更新一次指标，包含 FPS/帧耗时 |
 | 原生日志控制台 | 支持查看并按级别过滤日志 | 1) 打开 console 面板；2) 切换 ALL/INFO/WARN/ERROR | 控制台可显示并按颜色/过滤器区分日志 |
 | 设置透传与生效 | 设置页修改 FPS 并影响游戏运行 | 1) 在 Settings 修改 FPS；2) 回到运行页观察指标变化 | 游戏统计中的 FPS 变化与设置一致 |
@@ -26,10 +29,11 @@
 ## 最近执行记录
 
 - 执行人：`game-studio` 当前流程负责人
-- 最后更新：2026-05-25 19:37 +0800
-- 主分支提交：当前 `main` HEAD（文档回填提交）；已验证代码提交：`640c492`
+- 最后更新：2026-05-28 13:47 +0800
+- 主分支提交：当前 `main` HEAD 加本轮视觉改造工作树；已验证代码提交：待 CI artifact 回填
 - CI 参考：
   - debug: `26398547200`（提交 `3007de0`，代码与 `640c492` 一致，仅多验收文档）
+  - debug latest: `26399181568`（提交 `51ee355`，失败；本轮已补 CI wrapper bootstrap 修复）
   - release: 待本轮 GitHub Actions 回填
 
 ## 交付要求

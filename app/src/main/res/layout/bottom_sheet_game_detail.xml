@@ -4,15 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="24dp"
-    android:background="@drawable/bottom_sheet_bg">
+    android:background="@drawable/bottom_sheet_bg"
+    android:padding="@dimen/space_xl">
 
     <View
         android:layout_width="40dp"
         android:layout_height="4dp"
         android:layout_gravity="center"
-        android:layout_marginBottom="24dp"
-        android:background="#DDDDDD" />
+        android:layout_marginBottom="@dimen/space_xl"
+        android:background="@drawable/bg_bottom_sheet_handle" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,7 +22,9 @@
 
         <FrameLayout
             android:layout_width="64dp"
-            android:layout_height="64dp">
+            android:layout_height="64dp"
+            android:background="@drawable/bg_game_icon_surface"
+            android:clipToOutline="true">
 
             <ImageView
                 android:id="@+id/detail_icon_iv"
@@ -37,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_brand"
                 android:textSize="24sp"
                 android:textStyle="bold" />
         </FrameLayout>
@@ -45,46 +47,43 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_lg"
             android:layout_weight="1"
-            android:layout_marginStart="16dp"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/detail_name_tv"
-                android:layout_width="wrap_content"
+                style="@style/TextAppearance.GameStudio.Title"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:textColor="#333333" />
+                android:ellipsize="end"
+                android:maxLines="2" />
 
             <TextView
                 android:id="@+id/detail_size_tv"
-                android:layout_width="wrap_content"
+                style="@style/TextAppearance.GameStudio.Caption"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textColor="#999999"
-                android:layout_marginTop="4dp" />
+                android:layout_marginTop="@dimen/space_xs" />
         </LinearLayout>
     </LinearLayout>
 
     <TextView
         android:id="@+id/detail_desc_tv"
+        style="@style/TextAppearance.GameStudio.Body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="This is a Cocos Creator game package. Ready to launch on the native high-performance engine."
-        android:textColor="#666666"
-        android:textSize="15sp"
-        android:lineSpacingExtra="4dp" />
+        android:layout_marginTop="@dimen/space_xl" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/play_button"
+        style="@style/Widget.GameStudio.PrimaryButton"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_marginTop="32dp"
-        android:text="Launch Game"
-        android:textAllCaps="false"
-        android:textSize="18sp"
-        app:cornerRadius="12dp" />
+        android:layout_marginTop="@dimen/space_2xl"
+        android:text="@string/launch_game"
+        app:icon="@drawable/ic_play_arrow"
+        app:iconGravity="textStart"
+        app:iconPadding="@dimen/space_sm" />
 
 </LinearLayout>

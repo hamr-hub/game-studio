@@ -1,114 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/settings_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#F5F5F5">
+    android:background="@color/surface_canvas"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/white"
-        app:title="Engine Settings"
-        app:navigationIcon="?attr/homeAsUpIndicator" />
+        android:background="@drawable/bg_app_header"
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        app:navigationIconTint="@color/text_primary"
+        app:title="@string/engine_settings"
+        app:titleTextAppearance="@style/TextAppearance.GameStudio.Title"
+        app:titleTextColor="@color/text_primary" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="@dimen/screen_padding">
 
             <TextView
+                style="@style/TextAppearance.GameStudio.Section"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rendering"
-                android:textColor="#2196F3"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="@dimen/space_md"
+                android:text="@string/settings_rendering" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
+                app:cardBackgroundColor="@color/surface"
+                app:cardCornerRadius="@dimen/radius_lg"
+                app:cardElevation="@dimen/card_elevation"
+                app:strokeColor="@color/divider"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="@dimen/card_padding">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
+                        android:minHeight="@dimen/tap_target_min"
                         android:orientation="horizontal">
 
                         <TextView
+                            style="@style/TextAppearance.GameStudio.Body"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="FPS Limit"
-                            android:textSize="16sp"
-                            android:textColor="#333333" />
+                            android:text="@string/settings_fps_limit"
+                            android:textColor="@color/text_primary" />
 
                         <Spinner
                             android:id="@+id/fps_spinner"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_search_field"
+                            android:minHeight="@dimen/tap_target_min"
+                            android:minWidth="96dp"
+                            android:paddingStart="@dimen/space_md"
+                            android:paddingEnd="@dimen/space_md"
+                            android:popupBackground="@color/surface" />
                     </LinearLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="#EEEEEE"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginBottom="16dp" />
+                        android:layout_marginTop="@dimen/space_lg"
+                        android:layout_marginBottom="@dimen/space_lg"
+                        android:background="@color/divider" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/shadows_switch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Enable Shadows"
-                        android:textSize="16sp"
-                        android:textColor="#333333" />
+                        android:minHeight="@dimen/tap_target_min"
+                        android:text="@string/settings_enable_shadows"
+                        android:textAppearance="@style/TextAppearance.GameStudio.Body"
+                        android:textColor="@color/text_primary" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
+                style="@style/TextAppearance.GameStudio.Section"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Experimental"
-                android:textColor="#2196F3"
-                android:textStyle="bold"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginTop="@dimen/space_xl"
+                android:layout_marginBottom="@dimen/space_md"
+                android:text="@string/settings_experimental" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
+                app:cardBackgroundColor="@color/surface"
+                app:cardCornerRadius="@dimen/radius_lg"
+                app:cardElevation="@dimen/card_elevation"
+                app:strokeColor="@color/divider"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:padding="@dimen/card_padding">
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/vulkan_switch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Use Vulkan API"
-                        android:textSize="16sp"
-                        android:textColor="#333333" />
+                        android:minHeight="@dimen/tap_target_min"
+                        android:text="@string/settings_use_vulkan"
+                        android:textAppearance="@style/TextAppearance.GameStudio.Body"
+                        android:textColor="@color/text_primary" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

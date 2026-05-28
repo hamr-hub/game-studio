@@ -2,22 +2,30 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp">
+    android:layout_height="168dp"
+    android:layout_margin="@dimen/space_sm"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="@color/surface"
+    app:cardCornerRadius="@dimen/radius_lg"
+    app:cardElevation="@dimen/card_elevation"
+    app:strokeColor="@color/divider"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
         android:orientation="vertical"
-        android:padding="12dp"
-        android:gravity="center">
+        android:padding="@dimen/card_padding">
 
         <FrameLayout
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginBottom="8dp">
+            android:layout_width="@dimen/game_icon_size"
+            android:layout_height="@dimen/game_icon_size"
+            android:layout_marginBottom="@dimen/space_md"
+            android:background="@drawable/bg_game_icon_surface"
+            android:clipToOutline="true">
 
             <ImageView
                 android:id="@+id/game_icon_iv"
@@ -32,30 +40,32 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:textColor="#FFFFFFFF"
+                android:textColor="@color/text_on_brand"
                 android:textStyle="bold"
-                android:textSize="28sp" />
+                android:textSize="26sp" />
         </FrameLayout>
 
         <TextView
             android:id="@+id/game_name_tv"
-            android:layout_width="wrap_content"
+            style="@style/TextAppearance.GameStudio.Body"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:maxLines="1"
             android:ellipsize="end"
             android:gravity="center"
-            android:textColor="#333333" />
+            android:maxLines="1"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/game_size_tv"
-            android:layout_width="wrap_content"
+            style="@style/TextAppearance.GameStudio.Caption"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textColor="#999999"
+            android:layout_marginTop="@dimen/space_xs"
+            android:ellipsize="end"
             android:gravity="center"
-            android:layout_marginTop="2dp" />
+            android:maxLines="1" />
 
     </LinearLayout>
 

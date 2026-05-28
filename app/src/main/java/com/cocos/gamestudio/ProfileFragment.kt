@@ -29,6 +29,8 @@ class ProfileFragment : Fragment() {
     private lateinit var gamesCountTv: TextView
     private lateinit var recentGamesRv: RecyclerView
     private lateinit var galleryRv: RecyclerView
+    private lateinit var recentEmptyTv: TextView
+    private lateinit var galleryEmptyTv: TextView
     private lateinit var adapter: GameListActivity.GameAdapter
     private lateinit var galleryAdapter: GalleryAdapter
     private lateinit var settingsBtn: View
@@ -39,12 +41,12 @@ class ProfileFragment : Fragment() {
             loadGallery()
         } else {
             galleryAdapter.updateData(emptyList())
+            updateGalleryEmpty(true, getString(R.string.gallery_permission_denied))
         }
     }
 
     companion object {
         private const val PREFS_NAME = "user_prefs"
-        private const val DEFAULT_NICKNAME = "Cocos Expert"
         private const val DEFAULT_LEVEL = 42
         private const val DEFAULT_MINUTES = 1337L
     }
@@ -62,6 +64,8 @@ class ProfileFragment : Fragment() {
         gamesCountTv = view.findViewById<TextView>(R.id.profile_games_count_tv)
         recentGamesRv = view.findViewById<RecyclerView>(R.id.recent_games_rv)
         galleryRv = view.findViewById(R.id.gallery_rv)
+        recentEmptyTv = view.findViewById(R.id.recent_empty_tv)
+        galleryEmptyTv = view.findViewById(R.id.gallery_empty_tv)
         settingsBtn = view.findViewById(R.id.settings_btn)
 
         settingsBtn.setOnClickListener {
@@ -70,11 +74,11 @@ class ProfileFragment : Fragment() {
 
         val prefs = requireContext().getSharedPreferences(PREFS_NAME, 0)
         
-        avatarIv.setImageResource(android.R.drawable.ic_menu_myplaces)
-        nicknameTv.text = prefs.getString("nickname", DEFAULT_NICKNAME)
-        levelTv.text = "Level ${prefs.getInt("level", DEFAULT_LEVEL)}"
+        avatarIv.setImageResource(R.drawable.ic_nav_profile)
+        nicknameTv.text = prefs.getString("nickname", getString(R.string.profile_default_nickname))
+        levelTv.text = getString(R.string.profile_level, prefs.getInt("level", DEFAULT_LEVEL))
         val minutesPlayed = prefs.getLong("minutes_played", DEFAULT_MINUTES)
-        minutesTv.text = getString(R.string.minutes_played, minutesPlayed)
+        minutesTv.text = minutesPlayed.toString()
 
         recentGamesRv.layoutManager = LinearLayoutManager(context)
         adapter = GameListActivity.GameAdapter(emptyList()) { game ->
@@ -132,6 +136,7 @@ class ProfileFragment : Fragment() {
                 list
             }
             galleryAdapter.updateData(images)
+            updateGalleryEmpty(images.isEmpty())
         }
     }
 
@@ -161,7 +166,16 @@ class ProfileFragment : Fragment() {
             
             adapter.updateData(recentGames)
             gamesCountTv.text = recentGames.size.toString()
+            val isEmpty = recentGames.isEmpty()
+            recentEmptyTv.visibility = if (isEmpty) View.VISIBLE else View.GONE
+            recentGamesRv.visibility = if (isEmpty) View.GONE else View.VISIBLE
         }
+    }
+
+    private fun updateGalleryEmpty(isEmpty: Boolean, message: String? = null) {
+        galleryEmptyTv.text = message ?: getString(R.string.no_captures)
+        galleryEmptyTv.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        galleryRv.visibility = if (isEmpty) View.GONE else View.VISIBLE
     }
 
     class GalleryAdapter(private var images: List<Uri>) : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
@@ -180,6 +194,11 @@ class ProfileFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            holder.imageView.setImageResource(R.drawable.ic_capture_placeholder)
+            holder.imageView.contentDescription = holder.imageView.context.getString(
+                R.string.capture_description,
+                position + 1,
+            )
             holder.imageView.setImageURI(images[position])
         }
 

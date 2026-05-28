@@ -2,15 +2,21 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="120dp"
-    android:layout_margin="4dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
+    android:layout_height="112dp"
+    android:layout_margin="@dimen/space_xs"
+    app:cardBackgroundColor="@color/capture_placeholder"
+    app:cardCornerRadius="@dimen/radius_md"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/divider"
+    app:strokeWidth="1dp">
 
     <ImageView
         android:id="@+id/gallery_item_iv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop" />
+        android:background="@drawable/bg_capture_placeholder"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_capture_placeholder" />
 
 </com.google.android.material.card.MaterialCardView>

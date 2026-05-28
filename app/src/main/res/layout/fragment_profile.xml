@@ -3,168 +3,183 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="@color/surface_canvas"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="@dimen/screen_padding">
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp">
+            app:cardBackgroundColor="@color/surface"
+            app:cardCornerRadius="@dimen/radius_lg"
+            app:cardElevation="@dimen/card_elevation"
+            app:strokeColor="@color/divider"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="24dp">
+                android:padding="@dimen/space_xl">
 
                 <ImageView
                     android:id="@+id/profile_avatar_iv"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:scaleType="centerCrop"
-                    android:src="@android:drawable/ic_menu_myplaces"
-                    android:background="@drawable/avatar_placeholder" />
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:background="@drawable/avatar_placeholder"
+                    android:contentDescription="@string/profile_avatar_description"
+                    android:padding="@dimen/space_xl"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_nav_profile"
+                    android:tint="@color/brand_primary" />
 
                 <TextView
                     android:id="@+id/profile_nickname_tv"
+                    style="@style/TextAppearance.GameStudio.Title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Cocos User"
-                    android:textColor="#333333"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:layout_marginTop="@dimen/space_lg"
+                    android:text="@string/profile_default_nickname" />
 
                 <TextView
                     android:id="@+id/profile_level_tv"
+                    style="@style/TextAppearance.GameStudio.Caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Level 5"
-                    android:textColor="#666666"
-                    android:textSize="14sp" />
+                    android:layout_marginTop="@dimen/space_xs"
+                    android:text="@string/profile_level_placeholder" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/settings_btn"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    style="@style/Widget.GameStudio.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Engine Settings"
-                    app:icon="@android:drawable/ic_menu_preferences" />
+                    android:layout_marginTop="@dimen/space_lg"
+                    android:text="@string/engine_settings"
+                    app:icon="@drawable/ic_settings"
+                    app:iconPadding="@dimen/space_sm" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="@dimen/space_lg"
             android:baselineAligned="false"
             android:orientation="horizontal">
 
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
+                android:layout_height="104dp"
+                android:layout_marginEnd="@dimen/space_sm"
                 android:layout_weight="1"
-                app:cardCornerRadius="12dp">
+                android:background="@drawable/bg_stat_tile"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="@dimen/space_lg">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/profile_minutes_tv"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/brand_primary"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    style="@style/TextAppearance.GameStudio.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_xs"
                     android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:text="@string/minutes_played_label" />
+            </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/profile_minutes_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="120"
-                        android:textColor="#2196F3"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Minutes Played"
-                        android:textColor="#666666"
-                        android:textSize="12sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_height="104dp"
+                android:layout_marginStart="@dimen/space_sm"
                 android:layout_weight="1"
-                app:cardCornerRadius="12dp">
+                android:background="@drawable/bg_stat_tile"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="@dimen/space_lg">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/profile_games_count_tv"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/brand_secondary"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    style="@style/TextAppearance.GameStudio.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_xs"
                     android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:id="@+id/profile_games_count_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="12"
-                        android:textColor="#4CAF50"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Games Played"
-                        android:textColor="#666666"
-                        android:textSize="12sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                    android:text="@string/games_played_label" />
+            </LinearLayout>
         </LinearLayout>
 
         <TextView
+            style="@style/TextAppearance.GameStudio.Section"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="12dp"
-            android:text="Recently Played"
-            android:textColor="#333333"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:layout_marginTop="@dimen/space_xl"
+            android:layout_marginBottom="@dimen/space_md"
+            android:text="@string/recent_games" />
+
+        <TextView
+            android:id="@+id/recent_empty_tv"
+            style="@style/TextAppearance.GameStudio.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_card_surface"
+            android:gravity="center"
+            android:padding="@dimen/space_xl"
+            android:text="@string/no_recent_games"
+            android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recent_games_rv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false" />
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never" />
 
         <TextView
+            style="@style/TextAppearance.GameStudio.Section"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="12dp"
-            android:text="My Captures"
-            android:textColor="#333333"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:layout_marginTop="@dimen/space_xl"
+            android:layout_marginBottom="@dimen/space_md"
+            android:text="@string/my_captures" />
+
+        <TextView
+            android:id="@+id/gallery_empty_tv"
+            style="@style/TextAppearance.GameStudio.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_card_surface"
+            android:gravity="center"
+            android:padding="@dimen/space_xl"
+            android:text="@string/no_captures"
+            android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/gallery_rv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false" />
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never" />
 
-        </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

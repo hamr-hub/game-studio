@@ -1,5 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#2196F3</color>
+    <color name="brand_primary">#0F766E</color>
+    <color name="brand_primary_dark">#115E59</color>
+    <color name="brand_primary_container">#D8F3EE</color>
+    <color name="brand_secondary">#2563EB</color>
+    <color name="brand_accent">#D97706</color>
+    <color name="brand_success">#15803D</color>
+
+    <color name="surface_canvas">#F7F8FA</color>
+    <color name="surface">#FFFFFFFF</color>
+    <color name="surface_subtle">#F1F5F9</color>
+    <color name="surface_pressed">#E6F4F1</color>
+    <color name="outline">#D7DEE8</color>
+    <color name="divider">#E5EAF0</color>
+
+    <color name="text_primary">#111827</color>
+    <color name="text_secondary">#4B5563</color>
+    <color name="text_tertiary">#6B7280</color>
+    <color name="text_on_brand">#FFFFFFFF</color>
+
+    <color name="icon_muted">#64748B</color>
+    <color name="capture_placeholder">#E8EDF3</color>
+
+    <color name="ic_launcher_background">@color/brand_primary</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

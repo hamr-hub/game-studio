@@ -10,7 +10,7 @@ APP_NAME="$(basename "$0")"
 APP_BASE_NAME=${APP_NAME%.sh}
 
 DEFAULT_JVM_OPTS=""
-CLASS_PATH="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
+CLASS_PATH="$APP_HOME/gradle/wrapper/gradle-wrapper.jar:$APP_HOME/gradle/wrapper/gradle-wrapper-shared.jar:$APP_HOME/gradle/wrapper/gradle-cli.jar"
 WILDFLY_JAVA_OPTS=""
 
 while true; do

@@ -1,38 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/game_list_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/surface_canvas">
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search_view"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_height="52dp"
+        android:layout_marginStart="@dimen/screen_padding"
+        android:layout_marginTop="@dimen/space_lg"
+        android:layout_marginEnd="@dimen/screen_padding"
+        android:background="@drawable/bg_search_field"
+        android:contentDescription="@string/search_hint"
+        android:minHeight="@dimen/tap_target_min"
         app:iconifiedByDefault="false"
-        app:queryHint="Search games..."
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:queryHint="@string/search_hint" />
+
+    <TextView
+        android:id="@+id/results_status_tv"
+        style="@style/TextAppearance.GameStudio.Caption"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/screen_padding"
+        android:layout_marginTop="@dimen/space_sm"
+        android:layout_marginEnd="@dimen/screen_padding"
+        android:accessibilityLiveRegion="polite"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/search_view" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/game_list_rv"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:padding="4dp"
-        app:layout_constraintTop_toBottomOf="@id/search_view"
+        android:clipToPadding="false"
+        android:paddingStart="@dimen/space_sm"
+        android:paddingTop="@dimen/space_sm"
+        android:paddingEnd="@dimen/space_sm"
+        android:paddingBottom="@dimen/space_lg"
+        android:scrollbars="false"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/results_status_tv" />
 
-    <ProgressBar
-        android:id="@+id/loading_pb"
+    <LinearLayout
+        android:id="@+id/empty_state_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/space_xl"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/game_list_rv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/game_list_rv">
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_empty_games" />
+
+        <TextView
+            style="@style/TextAppearance.GameStudio.Section"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_lg"
+            android:text="@string/no_games_found" />
+
+        <TextView
+            style="@style/TextAppearance.GameStudio.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_sm"
+            android:gravity="center"
+            android:text="@string/no_games_found_detail" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/loading_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:accessibilityLiveRegion="polite"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/space_xl"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ProgressBar
+            android:id="@+id/loading_pb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            style="@style/TextAppearance.GameStudio.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_md"
+            android:text="@string/loading_games" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,10 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/nav_games"
-        android:icon="@android:drawable/ic_menu_gallery"
-        android:title="Games" />
+        android:icon="@drawable/ic_nav_games"
+        android:title="@string/nav_games" />
     <item
         android:id="@+id/nav_profile"
-        android:icon="@android:drawable/ic_menu_myplaces"
-        android:title="Profile" />
+        android:icon="@drawable/ic_nav_profile"
+        android:title="@string/nav_profile" />
 </menu>

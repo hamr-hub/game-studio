@@ -8,7 +8,9 @@ cd "$ROOT_DIR"
 GRADLE_VERSION="9.4.1"
 WRAPPER_DIR="gradle/wrapper"
 WRAPPER_PROP_FILE="$WRAPPER_DIR/gradle-wrapper.properties"
-WRAPPER_JAR_FILE="$WRAPPER_DIR/gradle-wrapper.jar"
+WRAPPER_MAIN_JAR_FILE="$WRAPPER_DIR/gradle-wrapper.jar"
+WRAPPER_SHARED_JAR_FILE="$WRAPPER_DIR/gradle-wrapper-shared.jar"
+WRAPPER_CLI_JAR_FILE="$WRAPPER_DIR/gradle-cli.jar"
 GRADLE_DIST="gradle-${GRADLE_VERSION}-bin.zip"
 GRADLE_ZIP="/tmp/${GRADLE_DIST}"
 GRADLE_SHA_FILE="/tmp/${GRADLE_DIST}.sha256"
@@ -125,7 +127,7 @@ zipStorePath=wrapper/dists
 EOF
 fi
 
-if [[ ! -f "$WRAPPER_JAR_FILE" ]]; then
+if [[ ! -f "$WRAPPER_MAIN_JAR_FILE" || ! -f "$WRAPPER_SHARED_JAR_FILE" || ! -f "$WRAPPER_CLI_JAR_FILE" ]]; then
   if ! command -v unzip >/dev/null 2>&1; then
     log "未检测到 unzip，请先安装 unzip"
     exit 1
@@ -161,14 +163,18 @@ if [[ ! -f "$WRAPPER_JAR_FILE" ]]; then
     exit 1
   fi
 
-  WRAPPER_JAR_SRC="$(find "$TMP_DIR/gradle-${GRADLE_VERSION}" -name 'gradle-wrapper-*.jar' | head -n 1)"
-  if [[ -z "$WRAPPER_JAR_SRC" ]]; then
-    log "未找到 gradle-wrapper jar，请检查下载文件完整性"
+  WRAPPER_MAIN_JAR_SRC="$(find "$TMP_DIR/gradle-${GRADLE_VERSION}" -path '*/lib/plugins/gradle-wrapper-main-*.jar' | head -n 1)"
+  WRAPPER_SHARED_JAR_SRC="$(find "$TMP_DIR/gradle-${GRADLE_VERSION}" -path '*/lib/gradle-wrapper-shared-*.jar' | head -n 1)"
+  WRAPPER_CLI_JAR_SRC="$(find "$TMP_DIR/gradle-${GRADLE_VERSION}" -path '*/lib/gradle-cli-*.jar' | head -n 1)"
+  if [[ -z "$WRAPPER_MAIN_JAR_SRC" || -z "$WRAPPER_SHARED_JAR_SRC" || -z "$WRAPPER_CLI_JAR_SRC" ]]; then
+    log "未找到 gradle wrapper main/shared/cli jar，请检查下载文件完整性"
     rm -rf "$TMP_DIR" "$GRADLE_ZIP" "$GRADLE_SHA_FILE"
     exit 1
   fi
 
-  cp "$WRAPPER_JAR_SRC" "$WRAPPER_JAR_FILE"
+  cp "$WRAPPER_MAIN_JAR_SRC" "$WRAPPER_MAIN_JAR_FILE"
+  cp "$WRAPPER_SHARED_JAR_SRC" "$WRAPPER_SHARED_JAR_FILE"
+  cp "$WRAPPER_CLI_JAR_SRC" "$WRAPPER_CLI_JAR_FILE"
   rm -rf "$TMP_DIR" "$GRADLE_ZIP" "$GRADLE_SHA_FILE"
 fi
 
@@ -186,7 +192,7 @@ APP_NAME="$(basename "$0")"
 APP_BASE_NAME=${APP_NAME%.sh}
 
 DEFAULT_JVM_OPTS=""
-CLASS_PATH="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
+CLASS_PATH="$APP_HOME/gradle/wrapper/gradle-wrapper.jar:$APP_HOME/gradle/wrapper/gradle-wrapper-shared.jar:$APP_HOME/gradle/wrapper/gradle-cli.jar"
 WILDFLY_JAVA_OPTS=""
 
 while true; do
