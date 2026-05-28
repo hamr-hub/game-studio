@@ -60,8 +60,10 @@
     <string name="launch_game_named">Launch %1$s</string>
     <string name="launching_game">Launching...</string>
     <string name="launching_named">Launching %1$s</string>
+    <string name="game_orientation_landscape">Landscape</string>
+    <string name="game_orientation_portrait">Portrait</string>
     <string name="game_icon_description">%1$s icon</string>
-    <string name="game_card_description">%1$s, %2$s. Double tap for details.</string>
+    <string name="game_card_description">%1$s, %2$s, %3$s. Double tap for details.</string>
     <string name="game_detail_description">%1$s details</string>
     <string name="capture_description">Game capture %1$d</string>
     <string name="my_captures">My Captures</string>

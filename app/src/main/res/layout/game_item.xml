@@ -2,7 +2,7 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="168dp"
+    android:layout_height="188dp"
     android:layout_margin="@dimen/space_sm"
     android:clickable="true"
     android:focusable="true"
@@ -16,14 +16,14 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
+        android:gravity="top"
         android:orientation="vertical"
-        android:padding="@dimen/card_padding">
+        android:padding="@dimen/space_md">
 
         <FrameLayout
             android:id="@+id/game_icon_container"
-            android:layout_width="@dimen/game_icon_size"
-            android:layout_height="@dimen/game_icon_size"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/game_cover_height"
             android:layout_marginBottom="@dimen/space_md"
             android:background="@drawable/bg_game_icon_surface"
             android:clipToOutline="true">
@@ -38,11 +38,27 @@
 
             <ImageView
                 android:id="@+id/game_cover_mark_iv"
-                android:layout_width="52dp"
-                android:layout_height="52dp"
+                android:layout_width="58dp"
+                android:layout_height="58dp"
                 android:layout_gravity="center"
+                android:alpha="0.76"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_game_cover_mark" />
+
+            <TextView
+                android:id="@+id/game_orientation_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="26dp"
+                android:layout_gravity="top|start"
+                android:layout_margin="@dimen/space_sm"
+                android:background="@drawable/bg_cover_chip"
+                android:gravity="center"
+                android:minWidth="64dp"
+                android:paddingStart="@dimen/space_sm"
+                android:paddingEnd="@dimen/space_sm"
+                android:textColor="@color/text_on_brand"
+                android:textSize="11sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/game_icon_tv"
@@ -58,27 +74,37 @@
                 android:maxLines="1" />
         </FrameLayout>
 
-        <TextView
-            android:id="@+id/game_name_tv"
-            style="@style/TextAppearance.GameStudio.Body"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:maxLines="1"
-            android:textColor="@color/text_primary"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/space_xs"
+            android:paddingEnd="@dimen/space_xs">
 
-        <TextView
-            android:id="@+id/game_size_tv"
-            style="@style/TextAppearance.GameStudio.Caption"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_xs"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:maxLines="1" />
+            <TextView
+                android:id="@+id/game_name_tv"
+                style="@style/TextAppearance.GameStudio.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="start"
+                android:maxLines="2"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/game_size_tv"
+                style="@style/TextAppearance.GameStudio.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xs"
+                android:ellipsize="end"
+                android:gravity="start"
+                android:maxLines="1" />
+        </LinearLayout>
 
     </LinearLayout>
 

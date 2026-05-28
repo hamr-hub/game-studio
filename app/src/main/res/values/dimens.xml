@@ -15,6 +15,7 @@
     <dimen name="screen_padding">16dp</dimen>
     <dimen name="card_padding">16dp</dimen>
     <dimen name="card_elevation">1dp</dimen>
+    <dimen name="game_cover_height">92dp</dimen>
     <dimen name="game_icon_size">76dp</dimen>
     <dimen name="game_icon_corner">14dp</dimen>
     <dimen name="tap_target_min">48dp</dimen>

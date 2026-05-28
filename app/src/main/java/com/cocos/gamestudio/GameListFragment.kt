@@ -1,7 +1,6 @@
 package com.cocos.gamestudio
 
 import android.content.Intent
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +9,6 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -70,6 +68,7 @@ class GameListFragment : Fragment() {
         val iconIv = bottomSheetView.findViewById<ImageView>(R.id.detail_icon_iv)
         val coverMarkIv = bottomSheetView.findViewById<ImageView>(R.id.detail_cover_mark_iv)
         val iconTv = bottomSheetView.findViewById<TextView>(R.id.detail_icon_tv)
+        val orientationTv = bottomSheetView.findViewById<TextView>(R.id.detail_orientation_tv)
         val nameTv = bottomSheetView.findViewById<TextView>(R.id.detail_name_tv)
         val sizeTv = bottomSheetView.findViewById<TextView>(R.id.detail_size_tv)
         val descTv = bottomSheetView.findViewById<TextView>(R.id.detail_desc_tv)
@@ -77,13 +76,8 @@ class GameListFragment : Fragment() {
 
         bottomSheetView.contentDescription = getString(R.string.game_detail_description, game.displayName)
         iconTv.text = game.iconLabel
-        val bg = GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            cornerRadius = resources.getDimension(R.dimen.game_icon_corner)
-            setColor(game.iconColor)
-            setStroke(1, ContextCompat.getColor(requireContext(), R.color.surface))
-        }
-        iconContainer.background = bg
+        GameCoverStyler.apply(iconContainer, game, resources.getDimension(R.dimen.game_icon_corner))
+        orientationTv.text = GameCoverStyler.orientationLabel(requireContext(), game.orientation)
         coverMarkIv.visibility = if (game.iconUri.isNullOrBlank()) View.VISIBLE else View.GONE
         iconTv.contentDescription = getString(R.string.game_icon_description, game.displayName)
         iconIv.contentDescription = getString(R.string.game_icon_description, game.displayName)

@@ -1,7 +1,6 @@
 package com.cocos.gamestudio
 
 import android.content.Intent
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +10,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -83,6 +81,7 @@ class GameListActivity : AppCompatActivity() {
             val iconImageView: ImageView = view.findViewById(R.id.game_icon_iv)
             val coverMarkView: ImageView = view.findViewById(R.id.game_cover_mark_iv)
             val iconView: TextView = view.findViewById(R.id.game_icon_tv)
+            val orientationView: TextView = view.findViewById(R.id.game_orientation_tv)
             val sizeView: TextView = view.findViewById(R.id.game_size_tv)
         }
 
@@ -119,15 +118,15 @@ class GameListActivity : AppCompatActivity() {
             val game = filteredGames[position]
             val context = holder.view.context
             holder.textView.text = game.displayName
-            val bg = GradientDrawable().apply {
-                shape = GradientDrawable.RECTANGLE
-                cornerRadius = holder.view.resources.getDimension(R.dimen.game_icon_corner)
-                setColor(game.iconColor)
-                setStroke(1, ContextCompat.getColor(context, R.color.surface))
-            }
-            holder.iconContainer.background = bg
+            GameCoverStyler.apply(
+                holder.iconContainer,
+                game,
+                holder.view.resources.getDimension(R.dimen.game_icon_corner),
+            )
             holder.coverMarkView.visibility = if (game.iconUri.isNullOrBlank()) View.VISIBLE else View.GONE
             holder.iconView.text = game.iconLabel
+            val orientationLabel = GameCoverStyler.orientationLabel(context, game.orientation)
+            holder.orientationView.text = orientationLabel
             holder.iconView.contentDescription = context.getString(R.string.game_icon_description, game.displayName)
             holder.iconImageView.contentDescription = context.getString(R.string.game_icon_description, game.displayName)
             GameIconLoader.bind(holder.iconImageView, holder.iconView, game)
@@ -136,6 +135,7 @@ class GameListActivity : AppCompatActivity() {
                 R.string.game_card_description,
                 game.displayName,
                 holder.sizeView.text,
+                orientationLabel,
             )
             holder.view.setOnClickListener { onClick(game) }
         }

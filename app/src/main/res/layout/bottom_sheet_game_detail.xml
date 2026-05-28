@@ -22,8 +22,8 @@
 
         <FrameLayout
             android:id="@+id/detail_icon_container"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="96dp"
+            android:layout_height="72dp"
             android:background="@drawable/bg_game_icon_surface"
             android:clipToOutline="true">
 
@@ -37,9 +37,10 @@
 
             <ImageView
                 android:id="@+id/detail_cover_mark_iv"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:layout_gravity="center"
+                android:alpha="0.76"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_game_cover_mark" />
 
@@ -77,6 +78,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_xs" />
+
+            <TextView
+                android:id="@+id/detail_orientation_tv"
+                style="@style/TextAppearance.GameStudio.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="26dp"
+                android:layout_marginTop="@dimen/space_sm"
+                android:background="@drawable/bg_status_pill"
+                android:gravity="center"
+                android:minWidth="72dp"
+                android:paddingStart="@dimen/space_sm"
+                android:paddingEnd="@dimen/space_sm"
+                android:textColor="@color/brand_primary"
+                android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
 
