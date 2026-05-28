@@ -36,8 +36,10 @@ class WebGameActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        gameOrientation = GameOrientationLock.apply(this, GameOrientation.LANDSCAPE)
         val configuredOrientation = applyConfiguredOrientation(intent.getStringExtra(GameActivity.EXTRA_GAME_ORIENTATION))
+        if (!configuredOrientation) {
+            gameOrientation = GameOrientationLock.apply(this, GameOrientation.LANDSCAPE)
+        }
 
         webView = WebView(this)
         setContentView(webView)

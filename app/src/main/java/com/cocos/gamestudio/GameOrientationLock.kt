@@ -7,13 +7,13 @@ object GameOrientationLock {
     fun apply(activity: Activity, rawOrientation: String?): String {
         val orientation = GameOrientation.normalize(rawOrientation.orEmpty()) ?: GameOrientation.LANDSCAPE
         activity.requestedOrientation = when (orientation) {
-            GameOrientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            else -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            GameOrientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+            else -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         }
         return orientation
     }
 
     fun clear(activity: Activity) {
-        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_USER
     }
 }

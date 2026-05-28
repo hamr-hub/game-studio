@@ -6,6 +6,8 @@ import java.io.File
 import java.io.IOException
 import java.util.Locale
 import java.util.zip.ZipFile
+import java.util.zip.ZipInputStream
+import org.json.JSONObject
 
 data class GameEntry(
     val id: String,
@@ -136,13 +138,14 @@ object GameCatalog {
             .ifBlank { "Mini Game" }
         val color = iconColors[(raw.hashCode() and Int.MAX_VALUE) % iconColors.size]
         val iconLabel = displayName.firstOrNull()?.uppercaseChar()?.toString() ?: "G"
+        val packageOrientation = resolvePackageOrientation(context, file, assetPath)
         return GameEntry(
             id = gameId,
             assetName = name,
             file = file,
             displayName = displayName,
             description = "This game package is ready to launch.",
-            orientation = GameOrientation.LANDSCAPE,
+            orientation = packageOrientation,
             iconLabel = iconLabel,
             iconColor = color,
             iconUri = null,
@@ -196,6 +199,64 @@ object GameCatalog {
             else -> null
         }
         return candidate?.takeIf { it.isNotEmpty() }
+    }
+
+    private fun resolvePackageOrientation(context: Context?, file: File, assetPath: String?): String {
+        val gameJson = readZipText(context, file, assetPath, "game.json")
+        return gameJson?.let { parsePackageOrientation(it) } ?: GameOrientation.LANDSCAPE
+    }
+
+    private fun parsePackageOrientation(content: String): String? {
+        return try {
+            val json = JSONObject(content)
+            val raw = listOf("deviceOrientation", "orientation", "screenOrientation")
+                .firstNotNullOfOrNull { key -> json.optString(key).takeIf { it.isNotBlank() } }
+            raw?.let { GameOrientation.normalize(it) }
+        } catch (_: Exception) {
+            Regex(
+                "\"(?:deviceOrientation|orientation|screenOrientation)\"\\s*:\\s*\"([^\"]+)\"",
+                RegexOption.IGNORE_CASE,
+            ).find(content)?.groupValues?.getOrNull(1)?.let { GameOrientation.normalize(it) }
+        }
+    }
+
+    private fun readZipText(
+        context: Context?,
+        file: File,
+        assetPath: String?,
+        entryName: String,
+    ): String? {
+        return try {
+            if (assetPath != null && context != null) {
+                context.assets.open(assetPath).use { input ->
+                    ZipInputStream(input).use { zip ->
+                        while (true) {
+                            val entry = zip.nextEntry ?: break
+                            if (!entry.isDirectory && entry.name == entryName) {
+                                return zip.bufferedReader(Charsets.UTF_8).readText()
+                            }
+                            zip.closeEntry()
+                        }
+                    }
+                }
+                null
+            } else if (file.isFile) {
+                ZipFile(file).use { zip ->
+                    val entry = zip.getEntry(entryName) ?: return null
+                    zip.getInputStream(entry).use { input ->
+                        input.bufferedReader(Charsets.UTF_8).readText()
+                    }
+                }
+            } else {
+                null
+            }
+        } catch (e: IOException) {
+            Log.w(TAG, "Failed to read $entryName from ${assetPath ?: file.path}", e)
+            null
+        } catch (e: RuntimeException) {
+            Log.w(TAG, "Failed to read $entryName from ${assetPath ?: file.path}", e)
+            null
+        }
     }
 
     private fun resolveAssetSize(context: Context, assetPath: String): Long {
