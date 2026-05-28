@@ -21,6 +21,7 @@ class GameListActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        GameOrientationLock.clear(this)
         setContentView(R.layout.activity_game_list)
 
         NativeEngine.nativeSetAssetManager(assets)
@@ -54,6 +55,11 @@ class GameListActivity : AppCompatActivity() {
             )
             bottomNavigation.selectedItemId = R.id.nav_games
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        GameOrientationLock.clear(this)
     }
 
     private fun loadFragment(fragment: Fragment, title: String, subtitle: String?) {

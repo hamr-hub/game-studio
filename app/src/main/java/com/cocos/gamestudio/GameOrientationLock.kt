@@ -12,4 +12,8 @@ object GameOrientationLock {
         }
         return orientation
     }
+
+    fun clear(activity: Activity) {
+        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    }
 }

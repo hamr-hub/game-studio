@@ -14,6 +14,7 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        GameOrientationLock.clear(this)
         setContentView(R.layout.activity_settings)
 
         val root = findViewById<View>(R.id.settings_root)
@@ -63,6 +64,11 @@ class SettingsActivity : AppCompatActivity() {
             val message = if (isChecked) R.string.settings_saved_vulkan_on else R.string.settings_saved_vulkan_off
             showSaved(root, getString(message))
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        GameOrientationLock.clear(this)
     }
 
     private fun showSaved(root: View, message: String) {
