@@ -188,13 +188,14 @@ object GameCatalog {
 
     private fun assetPathFromGamePath(path: String): String? {
         val trimmed = path.trim()
-        return when {
+        val candidate = when {
             trimmed.startsWith("assets://") -> trimmed.removePrefix("assets://").trimStart('/')
             trimmed.startsWith("/assets://") -> trimmed.removePrefix("/assets://").trimStart('/')
             trimmed.startsWith("assets:/") -> trimmed.removePrefix("assets:/").trimStart('/')
             trimmed.startsWith("/assets:/") -> trimmed.removePrefix("/assets:/").trimStart('/')
             else -> null
-        }.takeIf { it.isNotEmpty() }
+        }
+        return candidate?.takeIf { it.isNotEmpty() }
     }
 
     private fun resolveAssetSize(context: Context, assetPath: String): Long {
