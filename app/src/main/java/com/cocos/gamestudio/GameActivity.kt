@@ -2,7 +2,6 @@ package com.cocos.gamestudio
 
 import android.content.ContentValues
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Build
@@ -227,11 +226,7 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
     }
 
     private fun applyRequestedGameOrientation(rawOrientation: String?) {
-        gameOrientation = GameOrientation.normalize(rawOrientation.orEmpty()) ?: GameOrientation.LANDSCAPE
-        requestedOrientation = when (gameOrientation) {
-            GameOrientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
-            else -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-        }
+        gameOrientation = GameOrientationLock.apply(this, rawOrientation)
     }
 
     private fun takeScreenshot() {
@@ -363,6 +358,7 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
 
     override fun onResume() {
         super.onResume()
+        GameOrientationLock.apply(this, gameOrientation)
         handler.post(statsUpdater)
         if (nativeEngineHandle != 0L) {
             NativeEngine.nativeResume(nativeEngineHandle)

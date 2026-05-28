@@ -2,7 +2,6 @@ package com.cocos.gamestudio
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.system.Os
 import android.util.Log
@@ -31,10 +30,11 @@ class WebGameActivity : AppCompatActivity() {
     private val TAG = "WebGameActivity"
     private lateinit var webView: WebView
     private lateinit var gamePath: String
+    private var gameOrientation: String = GameOrientation.LANDSCAPE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        gameOrientation = GameOrientationLock.apply(this, GameOrientation.LANDSCAPE)
         val configuredOrientation = applyConfiguredOrientation(intent.getStringExtra(GameActivity.EXTRA_GAME_ORIENTATION))
 
         webView = WebView(this)
@@ -503,23 +503,19 @@ class WebGameActivity : AppCompatActivity() {
             return
         }
 
-        requestedOrientation = when {
+        when {
             content.contains("\"deviceOrientation\"", ignoreCase = true) &&
                 content.contains("\"portrait\"", ignoreCase = true) ->
-                ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+                gameOrientation = GameOrientationLock.apply(this, GameOrientation.PORTRAIT)
             content.contains("\"deviceOrientation\"", ignoreCase = true) &&
                 content.contains("\"landscape\"", ignoreCase = true) ->
-                ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-            else -> requestedOrientation
+                gameOrientation = GameOrientationLock.apply(this, GameOrientation.LANDSCAPE)
         }
     }
 
     private fun applyConfiguredOrientation(rawOrientation: String?): Boolean {
         val orientation = GameOrientation.normalize(rawOrientation.orEmpty()) ?: return false
-        requestedOrientation = when (orientation) {
-            GameOrientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
-            else -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-        }
+        gameOrientation = GameOrientationLock.apply(this, orientation)
         return true
     }
 
@@ -1531,5 +1527,10 @@ class WebGameActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         webView.destroy()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        GameOrientationLock.apply(this, gameOrientation)
     }
 }
