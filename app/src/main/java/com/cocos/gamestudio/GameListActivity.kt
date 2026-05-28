@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -78,7 +79,9 @@ class GameListActivity : AppCompatActivity() {
 
         class MyViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
             val textView: TextView = view.findViewById(R.id.game_name_tv)
+            val iconContainer: FrameLayout = view.findViewById(R.id.game_icon_container)
             val iconImageView: ImageView = view.findViewById(R.id.game_icon_iv)
+            val coverMarkView: ImageView = view.findViewById(R.id.game_cover_mark_iv)
             val iconView: TextView = view.findViewById(R.id.game_icon_tv)
             val sizeView: TextView = view.findViewById(R.id.game_size_tv)
         }
@@ -122,7 +125,8 @@ class GameListActivity : AppCompatActivity() {
                 setColor(game.iconColor)
                 setStroke(1, ContextCompat.getColor(context, R.color.surface))
             }
-            holder.iconView.background = bg
+            holder.iconContainer.background = bg
+            holder.coverMarkView.visibility = if (game.iconUri.isNullOrBlank()) View.VISIBLE else View.GONE
             holder.iconView.text = game.iconLabel
             holder.iconView.contentDescription = context.getString(R.string.game_icon_description, game.displayName)
             holder.iconImageView.contentDescription = context.getString(R.string.game_icon_description, game.displayName)

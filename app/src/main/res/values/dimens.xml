@@ -7,15 +7,15 @@
     <dimen name="space_xl">24dp</dimen>
     <dimen name="space_2xl">32dp</dimen>
 
-    <dimen name="radius_sm">8dp</dimen>
-    <dimen name="radius_md">12dp</dimen>
-    <dimen name="radius_lg">16dp</dimen>
-    <dimen name="radius_xl">20dp</dimen>
+    <dimen name="radius_sm">6dp</dimen>
+    <dimen name="radius_md">8dp</dimen>
+    <dimen name="radius_lg">8dp</dimen>
+    <dimen name="radius_xl">16dp</dimen>
 
     <dimen name="screen_padding">16dp</dimen>
     <dimen name="card_padding">16dp</dimen>
     <dimen name="card_elevation">1dp</dimen>
     <dimen name="game_icon_size">76dp</dimen>
-    <dimen name="game_icon_corner">18dp</dimen>
+    <dimen name="game_icon_corner">14dp</dimen>
     <dimen name="tap_target_min">48dp</dimen>
 </resources>

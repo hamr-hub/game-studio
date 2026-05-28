@@ -21,6 +21,7 @@
         android:padding="@dimen/card_padding">
 
         <FrameLayout
+            android:id="@+id/game_icon_container"
             android:layout_width="@dimen/game_icon_size"
             android:layout_height="@dimen/game_icon_size"
             android:layout_marginBottom="@dimen/space_md"
@@ -35,14 +36,26 @@
                 android:scaleType="centerCrop"
                 android:visibility="gone" />
 
+            <ImageView
+                android:id="@+id/game_cover_mark_iv"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_game_cover_mark" />
+
             <TextView
                 android:id="@+id/game_icon_tv"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="44dp"
+                android:layout_height="28dp"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="@dimen/space_sm"
+                android:background="@drawable/bg_game_label_badge"
                 android:gravity="center"
                 android:textColor="@color/text_on_brand"
+                android:textSize="15sp"
                 android:textStyle="bold"
-                android:textSize="26sp" />
+                android:maxLines="1" />
         </FrameLayout>
 
         <TextView
