@@ -33,7 +33,7 @@
 - 主分支提交：当前 `main` HEAD 加本轮视觉改造工作树；已验证代码提交：待 CI artifact 回填
 - CI 参考：
   - debug: `26398547200`（提交 `3007de0`，代码与 `640c492` 一致，仅多验收文档）
-  - debug latest: `26399181568`（提交 `51ee355`，失败；本轮已补 CI wrapper bootstrap 修复）
+  - debug latest: `26557379625`（提交 `6c73348`，失败点已转为外部 `cocos4-rust` 最新 HEAD 语法错误；本轮已固定依赖 ref 待新 run 验证）
   - release: 待本轮 GitHub Actions 回填
 
 ## 交付要求

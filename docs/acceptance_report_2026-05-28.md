@@ -27,6 +27,7 @@
 | Gradle wrapper 启动 | 通过 | `./gradlew --version` 在 JDK 26 下输出 `Gradle 9.4.1`。 |
 | Gradle 配置级检查 | 通过 | `./gradlew :app:tasks --all` 成功，未执行 `assemble*`。 |
 | ADB 设备 | 通过 | `R5CR70SRPSD device usb:1-1 product:o1qzcx model:SM_G9910`。 |
+| CI 外部依赖稳定性 | 修复中 | run `26557379625` 已通过 wrapper 阶段，但外部 `Dave-he/cocos4-rust` 最新 `19d5568` Rust 语法失败；已将 workflows 固定到历史成功期提交 `19d05d96359978d1bbdf81157e9573124cb47aa3`。 |
 
 ## 3. 未完成/待真机回归
 
@@ -40,4 +41,4 @@
 
 - 本轮未在本地生成 APK，遵守 CI-only 安装约束。
 - 本地 `aapt2` 二进制无法直接运行，报 `qemu-x86_64: Could not open '/lib64/ld-linux-x86-64.so.2'`；已用 XML/引用检查和 Gradle 配置检查替代，最终资源编译仍以 GitHub Actions 为准。
-- 最新已知 debug CI run `26399181568` 失败；本轮已修复 wrapper bootstrap 路径，需推送后以新 run 结果确认。
+- 最新已知 debug CI run `26557379625` 失败点为外部 `Dave-he/cocos4-rust` 最新 HEAD 语法错误；已固定到历史成功期提交，需新 run 结果确认。

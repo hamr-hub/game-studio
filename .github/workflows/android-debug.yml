@@ -33,6 +33,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Dave-he/cocos4-rust
+          ref: 19d05d96359978d1bbdf81157e9573124cb47aa3
           path: cocos4-rust
 
       - name: Link cocos4-rust for native build
