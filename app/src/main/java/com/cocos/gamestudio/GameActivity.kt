@@ -44,6 +44,7 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
     private var gamePath: String = ""
     private var requestedPath: String = ""
     private var gameOrientation: String = GameOrientation.LANDSCAPE
+    private var shouldRecordSession = true
     
     private val handler = Handler(Looper.getMainLooper())
     private val statsUpdater = object : Runnable {
@@ -213,6 +214,7 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
     private fun fallbackToWebRuntime(reason: String) {
         allLogs.add("Falling back to web runtime: $reason")
         refreshConsole()
+        shouldRecordSession = false
         if (nativeEngineHandle != 0L) {
             NativeEngine.nativeDestroy(nativeEngineHandle)
             nativeEngineHandle = 0L
@@ -338,13 +340,9 @@ class GameActivity : AppCompatActivity(), SurfaceHolder.Callback {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (startTime > 0) {
+        if (shouldRecordSession && startTime > 0 && gamePath.isNotBlank()) {
             val endTime = System.currentTimeMillis()
-            val durationMinutes = (endTime - startTime) / 60000
-
-            val prefs = getSharedPreferences("user_prefs", 0)
-            val totalMinutes = prefs.getLong("minutes_played", 0)
-            prefs.edit().putLong("minutes_played", totalMinutes + durationMinutes).apply()
+            PlayerProgressRepository.recordSession(this, gamePath, endTime - startTime)
         }
     }
 

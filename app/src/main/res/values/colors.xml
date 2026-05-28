@@ -6,6 +6,11 @@
     <color name="brand_secondary">#2563EB</color>
     <color name="brand_accent">#D97706</color>
     <color name="brand_success">#15803D</color>
+    <color name="brand_warning_container">#FEF3C7</color>
+    <color name="brand_success_container">#DCFCE7</color>
+    <color name="brand_secondary_container">#DBEAFE</color>
+    <color name="brand_violet">#7C3AED</color>
+    <color name="brand_violet_container">#EDE9FE</color>
 
     <color name="surface_canvas">#F7F8FA</color>
     <color name="surface">#FFFFFFFF</color>
@@ -21,6 +26,7 @@
 
     <color name="icon_muted">#64748B</color>
     <color name="capture_placeholder">#E8EDF3</color>
+    <color name="locked_content">#94A3B8</color>
 
     <color name="ic_launcher_background">@color/brand_primary</color>
     <color name="white">#FFFFFFFF</color>

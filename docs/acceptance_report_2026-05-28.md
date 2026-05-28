@@ -1,10 +1,10 @@
 # 视觉一致性与交互反馈验收报告
 
-- 报告时间：2026-05-28 13:47:06 +0800
+- 报告时间：2026-05-28 15:39:01 +0800
 - 验收人：Game Studio 开发协作流程
 - 设备状态：Samsung `SM-G9910`（`R5CR70SRPSD`）已通过 `adb devices -l` 检测为 `device`
 - 安装来源约束：本轮未执行本地 `assemble*`，真机安装仍要求使用 GitHub Actions artifact
-- 本轮性质：视觉资源、主界面 UI 一致性、基础交互反馈与 CI artifact 通道修复
+- 本轮性质：视觉资源、主界面 UI 一致性、基础交互反馈、Profile 激励体系与 CI artifact 通道修复
 
 ## 1. 本轮改造范围
 
@@ -18,13 +18,19 @@
 | Settings | 已完成静态落地 | 统一 Toolbar、卡片、Spinner 外观、Switch 文本样式；FPS/开关修改后 Snackbar + accessibility announce。 |
 | CI artifact 通道 | 已修复配置 | `android-debug.yml` 与 `android-release.yml` 在打包前执行 `scripts/bootstrap_gradle.sh`；同步修复 Gradle 9.4.1 wrapper main/shared/cli/files jar 拆分问题。 |
 | 内置游戏资源 | 已恢复 | 真机首轮安装显示 `0 games available`，取证发现当前 HEAD 缺失历史内置 `assets/games/*.zip`；已从历史成功提交 `3007de0` 恢复 14 个内置包，目录约 71 MB。 |
+| App 图标体系 | 已完成静态落地 | adaptive foreground 改为游戏手柄/徽章组合，mdpi 到 xxxhdpi legacy 与 round PNG 已重新生成并校验尺寸。 |
+| Profile 玩家资料 | 已完成静态落地 | Profile 改为资料头、等级、积分、XP 进度、游玩时长、连续天数、奖章、奖励任务、历史游戏、排行榜和截图图库组合。 |
+| 激励体系数据 | 已完成静态落地 | 新增 `PlayerProgressRepository`，按游戏路径记录累计时长、session 次数、最近游玩时间、积分、等级、奖章解锁、奖励任务进度和排行榜排序。 |
+| 游戏会话记录 | 已完成静态落地 | `GameActivity` 与 `WebGameActivity` 退出时记录有效会话；原生回退到 Web 时避免重复计入；Profile 返回时刷新。 |
 
 ## 2. 已执行检查
 
 | 检查项 | 结果 | 证据 |
 |---|---|---|
 | XML 语法与资源引用 | 通过 | `XML/reference OK: 32 XML files`。 |
+| 本轮 XML 语法 | 通过 | `python3` 解析 `app/src/main/res/**/*.xml` 输出 `xml-ok`。 |
 | 空白与补丁格式 | 通过 | `git diff --check` 无输出。 |
+| Launcher PNG | 通过 | `file` 检查 mdpi/hdpi/xhdpi/xxhdpi/xxxhdpi launcher 与 round PNG 均为对应尺寸 RGBA PNG。 |
 | Gradle wrapper 启动 | 通过 | `./gradlew --version` 在 JDK 26 下输出 `Gradle 9.4.1`。 |
 | Gradle 配置级检查 | 通过 | `./gradlew :app:tasks --all` 成功，未执行 `assemble*`。 |
 | ADB 设备 | 通过 | `R5CR70SRPSD device usb:1-1 product:o1qzcx model:SM_G9910`。 |
@@ -36,6 +42,7 @@
 | 项目 | 当前状态 | 后续验收方式 |
 |---|---|---|
 | 本轮 UI 真机截图比对 | 待 CI artifact | 推送后触发 `Android Debug APK`，使用 `fetch_ci_debug_apk.sh --type=debug --abi=arm64-v8a --serial=R5CR70SRPSD` 安装并截图检查列表、详情、Profile、Settings。 |
+| Profile 激励体系真机回归 | 待 CI artifact | 安装本轮 debug artifact 后首次打开 Profile 检查空态；启动并退出一个内置游戏后检查积分、历史时长、session 次数、奖章、奖励进度和排行榜刷新。 |
 | 字号放大与 TalkBack | 待真机专项 | 真机开启字体放大和 TalkBack，检查卡片、按钮、设置项、截图项读屏顺序。 |
 | Release 安装验证 | 待 CI artifact | `Android Release APK` 成功后下载安装 `game-studio-release-arm64-v8a-apk`。 |
 

@@ -31,6 +31,8 @@ class WebGameActivity : AppCompatActivity() {
     private lateinit var webView: WebView
     private lateinit var gamePath: String
     private var gameOrientation: String = GameOrientation.LANDSCAPE
+    private var startTime: Long = 0L
+    private var shouldRecordSession = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,9 +44,12 @@ class WebGameActivity : AppCompatActivity() {
 
         gamePath = normalizeAssetPath(intent.getStringExtra("GAME_PATH") ?: "")
         if (gamePath.isBlank()) {
+            shouldRecordSession = false
             finish()
             return
         }
+
+        GameCatalog.addToRecent(getSharedPreferences("user_prefs", 0), gamePath)
 
         setupWebView()
         runWebGame(gamePath, configuredOrientation)
@@ -146,10 +151,12 @@ class WebGameActivity : AppCompatActivity() {
         val baseDir = prepareGameSandbox(normalizedPath)
         if (baseDir == null) {
             Log.i(TAG, "Web sandbox unavailable for $normalizedPath")
+            shouldRecordSession = false
             finish()
             return
         }
 
+        startTime = System.currentTimeMillis()
         if (!hasConfiguredOrientation) {
             applyPackageOrientation(baseDir)
         }
@@ -1526,6 +1533,9 @@ class WebGameActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        if (shouldRecordSession && startTime > 0L && ::gamePath.isInitialized && gamePath.isNotBlank()) {
+            PlayerProgressRepository.recordSession(this, gamePath, System.currentTimeMillis() - startTime)
+        }
         webView.destroy()
     }
 
