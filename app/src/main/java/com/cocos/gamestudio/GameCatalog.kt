@@ -91,7 +91,7 @@ object GameCatalog {
     }
 
     private fun isLaunchable(entry: GameEntry): Boolean {
-        return entry.file.path.startsWith("assets://") || entry.file.exists()
+        return assetPathFromGamePath(entry.file.path) != null || entry.file.exists()
     }
 
     private fun listFromFileSystem(dir: File): List<GameEntry> {
@@ -119,13 +119,10 @@ object GameCatalog {
 
     private fun toEntry(context: Context?, file: File): GameEntry {
         val path = file.path
-        val name = if (path.startsWith("assets://")) {
-            path.substringAfterLast("/")
-        } else {
-            file.name
-        }
-        val size = if (path.startsWith("assets://") && context != null) {
-            resolveAssetSize(context, path.removePrefix("assets://").trimStart('/'))
+        val assetPath = assetPathFromGamePath(path)
+        val name = assetPath?.substringAfterLast("/") ?: file.name
+        val size = if (assetPath != null && context != null) {
+            resolveAssetSize(context, assetPath)
         } else {
             file.length()
         }
@@ -187,6 +184,17 @@ object GameCatalog {
         } catch (_: Exception) {
             null
         }
+    }
+
+    private fun assetPathFromGamePath(path: String): String? {
+        val trimmed = path.trim()
+        return when {
+            trimmed.startsWith("assets://") -> trimmed.removePrefix("assets://").trimStart('/')
+            trimmed.startsWith("/assets://") -> trimmed.removePrefix("/assets://").trimStart('/')
+            trimmed.startsWith("assets:/") -> trimmed.removePrefix("assets:/").trimStart('/')
+            trimmed.startsWith("/assets:/") -> trimmed.removePrefix("/assets:/").trimStart('/')
+            else -> null
+        }.takeIf { it.isNotEmpty() }
     }
 
     private fun resolveAssetSize(context: Context, assetPath: String): Long {
