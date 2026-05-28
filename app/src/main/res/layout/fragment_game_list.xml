@@ -44,7 +44,7 @@
         android:paddingTop="@dimen/space_sm"
         android:paddingEnd="@dimen/space_sm"
         android:paddingBottom="@dimen/space_lg"
-        android:scrollbars="false"
+        android:scrollbars="none"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
