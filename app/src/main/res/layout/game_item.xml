@@ -48,16 +48,16 @@
             <TextView
                 android:id="@+id/game_orientation_tv"
                 android:layout_width="wrap_content"
-                android:layout_height="26dp"
+                android:layout_height="24dp"
                 android:layout_gravity="top|start"
                 android:layout_margin="@dimen/space_sm"
                 android:background="@drawable/bg_cover_chip"
                 android:gravity="center"
-                android:minWidth="64dp"
-                android:paddingStart="@dimen/space_sm"
-                android:paddingEnd="@dimen/space_sm"
+                android:minWidth="56dp"
+                android:paddingStart="@dimen/space_xs"
+                android:paddingEnd="@dimen/space_xs"
                 android:textColor="@color/text_on_brand"
-                android:textSize="11sp"
+                android:textSize="10sp"
                 android:textStyle="bold" />
 
             <TextView
