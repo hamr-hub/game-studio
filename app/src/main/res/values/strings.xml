@@ -42,8 +42,15 @@
     <string name="settings_rendering">Rendering</string>
     <string name="settings_experimental">Experimental</string>
     <string name="settings_fps_limit">FPS Limit</string>
+    <string name="settings_fps_detail">Balance smoothness and battery use.</string>
     <string name="settings_enable_shadows">Enable Shadows</string>
+    <string name="settings_shadows_detail">Adds depth when the native scene supports it.</string>
     <string name="settings_use_vulkan">Use Vulkan API</string>
+    <string name="settings_vulkan_detail">Experimental backend for compatible devices.</string>
+    <string name="settings_fps_30">30</string>
+    <string name="settings_fps_60">60</string>
+    <string name="settings_fps_90">90</string>
+    <string name="settings_fps_120">120</string>
     <string name="settings_saved_fps">FPS limit set to %1$s</string>
     <string name="settings_saved_shadows_on">Shadows enabled</string>
     <string name="settings_saved_shadows_off">Shadows disabled</string>

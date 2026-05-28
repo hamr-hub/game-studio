@@ -3,10 +3,9 @@ package com.cocos.gamestudio
 import android.content.Context
 import android.os.Bundle
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 
@@ -23,34 +22,33 @@ class SettingsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
 
-        val fpsSpinner = findViewById<Spinner>(R.id.fps_spinner)
+        val fpsToggleGroup = findViewById<MaterialButtonToggleGroup>(R.id.fps_toggle_group)
         val shadowsSwitch = findViewById<SwitchMaterial>(R.id.shadows_switch)
         val vulkanSwitch = findViewById<SwitchMaterial>(R.id.vulkan_switch)
+        val shadowsRow = findViewById<View>(R.id.shadows_row)
+        val vulkanRow = findViewById<View>(R.id.vulkan_row)
 
         val prefs = getSharedPreferences("engine_settings", Context.MODE_PRIVATE)
 
-        val fpsOptions = arrayOf("30", "60", "90", "120")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, fpsOptions)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        fpsSpinner.adapter = adapter
-        
-        val currentFps = prefs.getInt("fps_limit", 60).toString()
-        fpsSpinner.setSelection(fpsOptions.indexOf(currentFps).coerceAtLeast(1))
+        val fpsButtonMap = mapOf(
+            R.id.fps_30_btn to 30,
+            R.id.fps_60_btn to 60,
+            R.id.fps_90_btn to 90,
+            R.id.fps_120_btn to 120,
+        )
+        val currentFps = prefs.getInt("fps_limit", 60)
+        val checkedButtonId = fpsButtonMap.entries.firstOrNull { it.value == currentFps }?.key ?: R.id.fps_60_btn
+        fpsToggleGroup.check(checkedButtonId)
 
         shadowsSwitch.isChecked = prefs.getBoolean("enable_shadows", true)
         vulkanSwitch.isChecked = prefs.getBoolean("use_vulkan", false)
 
-        var suppressInitialFpsEvent = true
-        fpsSpinner.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
-                prefs.edit().putInt("fps_limit", fpsOptions[position].toInt()).apply()
-                if (suppressInitialFpsEvent) {
-                    suppressInitialFpsEvent = false
-                    return
-                }
-                showSaved(root, getString(R.string.settings_saved_fps, fpsOptions[position]))
+        fpsToggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                val fps = fpsButtonMap[checkedId] ?: return@addOnButtonCheckedListener
+                prefs.edit().putInt("fps_limit", fps).apply()
+                showSaved(root, getString(R.string.settings_saved_fps, fps.toString()))
             }
-            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
         }
 
         shadowsSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -58,11 +56,17 @@ class SettingsActivity : AppCompatActivity() {
             val message = if (isChecked) R.string.settings_saved_shadows_on else R.string.settings_saved_shadows_off
             showSaved(root, getString(message))
         }
+        shadowsRow.setOnClickListener {
+            shadowsSwitch.isChecked = !shadowsSwitch.isChecked
+        }
 
         vulkanSwitch.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("use_vulkan", isChecked).apply()
             val message = if (isChecked) R.string.settings_saved_vulkan_on else R.string.settings_saved_vulkan_off
             showSaved(root, getString(message))
+        }
+        vulkanRow.setOnClickListener {
+            vulkanSwitch.isChecked = !vulkanSwitch.isChecked
         }
     }
 
