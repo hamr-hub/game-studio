@@ -1,10 +1,10 @@
 # 视觉一致性与交互反馈验收报告
 
-- 报告时间：2026-05-28 17:53:08 +0800
+- 报告时间：2026-05-28 18:31:47 +0800
 - 验收人：Game Studio 开发协作流程
 - 设备状态：Samsung `SM-G9910`（`R5CR70SRPSD`）已通过 `adb devices -l` 检测为 `device`
 - 安装来源约束：本轮未执行本地 `assemble*`，真机安装仍要求使用 GitHub Actions artifact
-- 本轮性质：视觉资源、主界面 UI 一致性、基础交互反馈、Profile 激励体系、鲜艳 Launcher 图标、Settings 控件打磨、游戏内横竖屏锁定与 CI artifact 通道验证
+- 本轮性质：视觉资源、主界面 UI 一致性、基础交互反馈、Profile 激励体系、鲜艳 Launcher 图标、Settings 控件打磨、游戏卡片封面化、游戏内横竖屏锁定与 CI artifact 通道验证
 
 ## 1. 本轮改造范围
 
@@ -14,6 +14,7 @@
 | 图标与 UI 切图资源 | 已完成静态落地 | 新增底部导航、设置、播放、空态、截图占位等 vector 资源；新增搜索框、卡片、图标容器、统计块、弹层把手等 shape 资源。 |
 | 游戏列表 | 已完成静态落地 | 搜索框、结果计数、加载状态、空状态、两/三列自适应网格、统一卡片高度和图片兜底已接入。 |
 | 游戏详情弹层 | 已完成静态落地 | 统一圆角图标容器、标题/说明样式、主按钮样式和启动 Snackbar 反馈。 |
+| 游戏封面卡片 | 已完成真机回归 | 列表卡片从居中彩色方块改为横向封面区域，使用渐变封面、手柄水印、数字徽章和方向元数据标签；详情弹层同步封面和方向标签。 |
 | Profile | 已完成静态落地 | 头像、统计块、最近游戏空态、截图空态和截图读屏描述已接入，移除系统默认图标混搭。 |
 | Settings | 已完成静态落地 | 统一 Toolbar、卡片、分段按钮和 Switch 文本样式；FPS/开关修改后 Snackbar + accessibility announce。 |
 | Settings 控件二次改造 | 已完成真机回归 | 移除系统 `Spinner`，改为 30/60/90/120 分段按钮；FPS、Shadows、Vulkan 均改为图标 + 标题 + 描述 + 明确控件，开关整行可点。 |
@@ -47,6 +48,8 @@
 | 图标与横竖屏真机安装 | 通过 | 旧 debug 包签名不一致，已卸载 `com.cocos.gamestudio` 后安装 run `26564442336` arm64 artifact；`dumpsys package` 显示安装时间 `2026-05-28 16:59:58`。 |
 | Settings 控件资源编译 | 通过 | run `26565860036` 曾因 `activity_settings.xml` 中 `app:checkable` 非法属性失败；提交 `372861e` 移除该属性后，run `26566114726` arm64-v8a 与 x86_64 均成功。 |
 | Settings 控件真机安装 | 通过 | run `26566114726`（提交 `372861e`）arm64 artifact `7262288845`，zip 大小 `79436119`，`unzip -t` 通过，解出 `/tmp/game-studio-ci-apk-372861e/app-debug.apk`；签名不一致时已卸载旧包后安装并启动。 |
+| 游戏封面卡片 CI debug | 通过 | run `26567930933`（提交 `2b22cce`）arm64-v8a 与 x86_64 成功，arm64 artifact `7263059298` 已安装检查；随后提交 `8e077a8` 缩小方向标签并修正按钮字距。 |
+| 游戏封面卡片最终安装 | 通过 | run `26568786951`（提交 `8e077a8`）arm64 artifact `7263405251`，zip 大小 `79438213`，`unzip -t` 通过，解出 `/tmp/game-studio-ci-apk-8e077a8/app-debug.apk`（`80486533` bytes）并安装真机。 |
 
 ## 3. Profile 激励体系真机回归
 
@@ -81,16 +84,25 @@
 | 游戏外方向恢复 | 通过 | Settings 页 `dumpsys window` 显示 `SettingsActivity` 且 `mCurrentAppOrientation=SCREEN_ORIENTATION_FULL_USER`，说明该页不继承游戏内横竖屏锁定。 |
 | Profile 权限弹窗 | 通过 | 重新安装后首次进入 Profile 触发系统媒体权限弹窗，已在真机授权后继续验证；该弹窗为 Android 权限流程，不属于 UI 资源识别异常。 |
 
-## 6. 未完成/待真机回归
+## 6. 游戏封面卡片真机回归
+
+| 场景 | 结果 | 证据 |
+|---|---|---|
+| 列表封面视觉 | 通过 | 真机截图 `/tmp/gs-8e077a8-list-covers.png` 显示 9 个游戏，卡片封面为横向渐变区域，含手柄水印、右下角数字徽章和较轻量的 `Portrait` 方向标签。 |
+| 详情弹层视觉 | 通过 | 真机截图 `/tmp/gs-8e077a8-detail-cover.png` 显示详情弹层使用同一封面语言，`Launch Game` 按钮字距已恢复正常。 |
+| 读屏元数据 | 通过 | UI dump 显示卡片 content-desc 为 `Game 1000013, 3.2 MB, Portrait. Double tap for details.`，详情弹层显示 `detail_orientation_tv` 为 `Portrait`。 |
+| 启动与方向回归 | 通过 | 从详情点击启动后焦点进入 `WebGameActivity`，`mCurrentAppOrientation=SCREEN_ORIENTATION_SENSOR_PORTRAIT`；返回列表后 `GameListActivity` 为 `SCREEN_ORIENTATION_FULL_USER`。 |
+
+## 7. 未完成/待真机回归
 
 | 项目 | 当前状态 | 后续验收方式 |
 |---|---|---|
-| 本轮 UI 真机截图比对 | 通过 | 已安装 run `26561542364` 的 arm64 debug artifact 并截图检查列表和 Profile。 |
+| 本轮 UI 真机截图比对 | 通过 | 已安装 run `26568786951` 的 arm64 debug artifact 并截图检查列表封面、详情弹层、Settings 和 Profile。 |
 | Profile 激励体系真机回归 | 通过 | 已验证空态、游戏会话写入、积分、历史、奖励进度和排行榜刷新。 |
 | 字号放大与 TalkBack | 待真机专项 | 真机开启字体放大和 TalkBack，检查卡片、按钮、设置项、截图项读屏顺序。 |
 | Release 安装验证 | 待 CI artifact | `Android Release APK` 成功后下载安装 `game-studio-release-arm64-v8a-apk`。 |
 
-## 7. 风险记录
+## 8. 风险记录
 
 - 本轮未在本地生成 APK，遵守 CI-only 安装约束。
 - `gh run download` 在本机下载大 artifact 时长时间无落盘；最终改用同一 artifact 的 Range 请求分段下载并校验 zip 大小与 `unzip -t`。
