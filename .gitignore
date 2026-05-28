@@ -21,6 +21,3 @@ native/Cargo.lock
 
 # OS
 .DS_Store
-
-# Game assets bundled from history
-/app/src/main/assets/games/

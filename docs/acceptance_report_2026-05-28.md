@@ -16,7 +16,8 @@
 | 游戏详情弹层 | 已完成静态落地 | 统一圆角图标容器、标题/说明样式、主按钮样式和启动 Snackbar 反馈。 |
 | Profile | 已完成静态落地 | 头像、统计块、最近游戏空态、截图空态和截图读屏描述已接入，移除系统默认图标混搭。 |
 | Settings | 已完成静态落地 | 统一 Toolbar、卡片、Spinner 外观、Switch 文本样式；FPS/开关修改后 Snackbar + accessibility announce。 |
-| CI artifact 通道 | 已修复配置 | `android-debug.yml` 与 `android-release.yml` 在打包前执行 `scripts/bootstrap_gradle.sh`；同步修复 Gradle 9.4.1 wrapper main/shared/cli jar 拆分问题。 |
+| CI artifact 通道 | 已修复配置 | `android-debug.yml` 与 `android-release.yml` 在打包前执行 `scripts/bootstrap_gradle.sh`；同步修复 Gradle 9.4.1 wrapper main/shared/cli/files jar 拆分问题。 |
+| 内置游戏资源 | 已恢复 | 真机首轮安装显示 `0 games available`，取证发现当前 HEAD 缺失历史内置 `assets/games/*.zip`；已从历史成功提交 `3007de0` 恢复 14 个内置包，目录约 71 MB。 |
 
 ## 2. 已执行检查
 
@@ -28,6 +29,7 @@
 | Gradle 配置级检查 | 通过 | `./gradlew :app:tasks --all` 成功，未执行 `assemble*`。 |
 | ADB 设备 | 通过 | `R5CR70SRPSD device usb:1-1 product:o1qzcx model:SM_G9910`。 |
 | CI 外部依赖稳定性 | 修复中 | run `26557379625` 已通过 wrapper 阶段，但外部 `Dave-he/cocos4-rust` 最新 `19d5568` Rust 语法失败；已将 workflows 固定到历史成功期提交 `19d05d96359978d1bbdf81157e9573124cb47aa3`。 |
+| CI debug artifact 安装 | 部分通过 | run `26557705462` 成功产出 arm64 artifact 并安装启动；首屏截图路径 `/tmp/game-studio-ui-2026-05-28.png`，但因内置游戏包缺失显示 0 个游戏，已恢复资源后需重新打包安装。 |
 
 ## 3. 未完成/待真机回归
 
