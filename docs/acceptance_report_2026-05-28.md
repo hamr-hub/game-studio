@@ -1,6 +1,6 @@
 # 视觉一致性与交互反馈验收报告
 
-- 报告时间：2026-05-28 15:39:01 +0800
+- 报告时间：2026-05-28 16:17:31 +0800
 - 验收人：Game Studio 开发协作流程
 - 设备状态：Samsung `SM-G9910`（`R5CR70SRPSD`）已通过 `adb devices -l` 检测为 `device`
 - 安装来源约束：本轮未执行本地 `assemble*`，真机安装仍要求使用 GitHub Actions artifact
@@ -34,20 +34,34 @@
 | Gradle wrapper 启动 | 通过 | `./gradlew --version` 在 JDK 26 下输出 `Gradle 9.4.1`。 |
 | Gradle 配置级检查 | 通过 | `./gradlew :app:tasks --all` 成功，未执行 `assemble*`。 |
 | ADB 设备 | 通过 | `R5CR70SRPSD device usb:1-1 product:o1qzcx model:SM_G9910`。 |
-| CI 外部依赖稳定性 | 修复中 | run `26557379625` 已通过 wrapper 阶段，但外部 `Dave-he/cocos4-rust` 最新 `19d5568` Rust 语法失败；已将 workflows 固定到历史成功期提交 `19d05d96359978d1bbdf81157e9573124cb47aa3`。 |
+| CI 外部依赖稳定性 | 通过 | 外部 `Dave-he/cocos4-rust` 依赖已固定到历史成功期提交 `19d05d96359978d1bbdf81157e9573124cb47aa3`；本轮 run `26561542364` 验证通过。 |
 | CI debug artifact 安装 | 部分通过 | run `26557705462` 成功产出 arm64 artifact 并安装启动；首屏截图路径 `/tmp/game-studio-ui-2026-05-28.png`，但因内置游戏包缺失显示 0 个游戏，已恢复资源后需重新打包安装。 |
+| 本轮 CI debug | 通过 | run `26561542364`（提交 `82f05d6`）arm64-v8a 与 x86_64 均成功。arm64 artifact `7260352346`，zip 大小 `79420752`，`unzip -t` 通过，解出 `/tmp/game-studio-ci-apk/app-debug.apk`。 |
+| 本轮真机安装 | 通过 | 设备 `R5CR70SRPSD` 上旧包因签名不一致无法覆盖安装，已卸载旧包后安装本轮 CI artifact 并启动 `com.cocos.gamestudio/.GameListActivity`。 |
 
-## 3. 未完成/待真机回归
+## 3. Profile 激励体系真机回归
+
+| 场景 | 结果 | 证据 |
+|---|---|---|
+| 列表首屏 | 通过 | UI dump 显示 `9 games available`，首屏含 `Game 1000013`、`Game 1000015` 等卡片；截图 `/tmp/game-studio-2026-05-28-profile-list.png`。 |
+| Profile 首次空态 | 通过 | 首次进入显示 `Cocos Expert`、`New Challenger`、`Level 1`、`Level 1 · 0/500 XP`、`0 min`、`Badges`、`Reward Board`；截图 `/tmp/game-studio-2026-05-28-profile-empty.png`。 |
+| 历史与排行榜空态 | 通过 | 下滑后显示 `Play History`、`Play a game to build history, medals, and rankings.`、`Game Leaderboard`、`Rankings appear after your first completed game session.`；截图 `/tmp/game-studio-2026-05-28-profile-empty-history.png`。 |
+| 游戏会话写入 | 通过 | 以 `assets://games/1000013_1.0.1.zip` 启动，焦点进入 `WebGameActivity`，停留后返回 Profile；截图 `/tmp/game-studio-2026-05-28-game-session.png`。 |
+| 会话后激励刷新 | 通过 | Profile 显示 `Game Explorer`、`Level 1 · 215/500 XP`、`215` points、`<1 min`、`Day Streak 1`、`First Run Unlocked`；截图 `/tmp/game-studio-2026-05-28-profile-after-session-top.png`。 |
+| 历史与排行榜刷新 | 通过 | 下滑后显示 `Game 1000013`、`<1 min · 1 sessions`、排行榜 `#1 Game 1000013 1 sessions <1 min`；截图 `/tmp/game-studio-2026-05-28-profile-after-session-history.png`。 |
+
+## 4. 未完成/待真机回归
 
 | 项目 | 当前状态 | 后续验收方式 |
 |---|---|---|
-| 本轮 UI 真机截图比对 | 待 CI artifact | 推送后触发 `Android Debug APK`，使用 `fetch_ci_debug_apk.sh --type=debug --abi=arm64-v8a --serial=R5CR70SRPSD` 安装并截图检查列表、详情、Profile、Settings。 |
-| Profile 激励体系真机回归 | 待 CI artifact | 安装本轮 debug artifact 后首次打开 Profile 检查空态；启动并退出一个内置游戏后检查积分、历史时长、session 次数、奖章、奖励进度和排行榜刷新。 |
+| 本轮 UI 真机截图比对 | 通过 | 已安装 run `26561542364` 的 arm64 debug artifact 并截图检查列表和 Profile。 |
+| Profile 激励体系真机回归 | 通过 | 已验证空态、游戏会话写入、积分、历史、奖励进度和排行榜刷新。 |
 | 字号放大与 TalkBack | 待真机专项 | 真机开启字体放大和 TalkBack，检查卡片、按钮、设置项、截图项读屏顺序。 |
 | Release 安装验证 | 待 CI artifact | `Android Release APK` 成功后下载安装 `game-studio-release-arm64-v8a-apk`。 |
 
-## 4. 风险记录
+## 5. 风险记录
 
 - 本轮未在本地生成 APK，遵守 CI-only 安装约束。
+- `gh run download` 在本机下载大 artifact 时长时间无落盘；最终改用同一 artifact 的 Range 请求分段下载并校验 zip 大小与 `unzip -t`。
 - 本地 `aapt2` 二进制无法直接运行，报 `qemu-x86_64: Could not open '/lib64/ld-linux-x86-64.so.2'`；已用 XML/引用检查和 Gradle 配置检查替代，最终资源编译仍以 GitHub Actions 为准。
-- 最新已知 debug CI run `26557379625` 失败点为外部 `Dave-he/cocos4-rust` 最新 HEAD 语法错误；已固定到历史成功期提交，需新 run 结果确认。
+- 旧 debug CI run `26557379625` 失败点为外部 `Dave-he/cocos4-rust` 最新 HEAD 语法错误；已固定到历史成功期提交，并由本轮 run `26561542364` 确认恢复。
